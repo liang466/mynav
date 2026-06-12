@@ -515,7 +515,7 @@ const DEFAULT_CATS=[
 
 // ====== Data ======
 function loadStore(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
-function saveStore(k,v){localStorage.setItem(k,JSON.stringify(v));scheduleAutoUpload();}
+function saveStore(k,v){localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('myNavLocalModified',Date.now().toString());scheduleAutoUpload();}
 let _autoUploadReady=false;
 let _autoUploadTimer=null;
 function scheduleAutoUpload(){
@@ -542,7 +542,9 @@ async function silentUpload(){
       method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},body:JSON.stringify(body)
     });
     if(resp.ok){
-      localStorage.setItem('myNavLastSync',Date.now());
+      const now=Date.now();
+      localStorage.setItem('myNavLastSync',now);
+      localStorage.setItem('myNavLocalModified',now.toString());
       console.log('Auto-uploaded at',new Date().toLocaleTimeString('zh-CN'));
     }
   }catch(e){console.log('Auto-upload failed:',e);}
@@ -558,10 +560,14 @@ async function silentDownload(){
     const file=await resp.json();
     const data=JSON.parse(decodeURIComponent(escape(atob(file.content))));
     const remoteTime=data.syncTime||0;
-    const localTime=parseInt(localStorage.getItem('myNavLastSync')||'0');
-    if(remoteTime>localTime){
+    const localModified=parseInt(localStorage.getItem('myNavLocalModified')||'0');
+    const localSync=parseInt(localStorage.getItem('myNavLastSync')||'0');
+    // Only download if cloud is newer than BOTH our last sync AND our last local edit
+    if(remoteTime>localSync && remoteTime>localModified){
       applySyncData(data);
-      localStorage.setItem('myNavLastSync',Date.now());
+      const now=Date.now();
+      localStorage.setItem('myNavLastSync',now);
+      localStorage.setItem('myNavLocalModified',now.toString());
       console.log('Auto-downloaded at',new Date().toLocaleTimeString('zh-CN'));
     }
   }catch(e){}
@@ -1411,6 +1417,7 @@ async function syncUp(){
     if(resp.ok){
       const now=Date.now();
       localStorage.setItem('myNavLastSync',now);
+      localStorage.setItem('myNavLocalModified',now.toString());
       document.getElementById('sync-last-time').textContent='上次同步：'+new Date(now).toLocaleString('zh-CN');
       document.getElementById('sync-status').textContent='✅ 上传成功';
       document.getElementById('sync-status').style.color='var(--success)';
@@ -1437,23 +1444,15 @@ async function syncDown(){
     if(!resp.ok)throw new Error('not found');
     const file=await resp.json();
     const data=JSON.parse(decodeURIComponent(escape(atob(file.content))));
-    const remoteTime=data.syncTime||0;
-    const localTime=parseInt(localStorage.getItem('myNavLastSync')||'0');
-    if(remoteTime>localTime||!localTime){
-      applySyncData(data);
-      const now=Date.now();
-      localStorage.setItem('myNavLastSync',now);
-      document.getElementById('sync-last-time').textContent='上次同步：'+new Date(now).toLocaleString('zh-CN');
-      document.getElementById('sync-status').textContent='✅ 已从云端同步最新数据';
-      document.getElementById('sync-status').style.color='var(--success)';
-      toast('已从云端同步');
-    }else if(remoteTime===localTime){
-      document.getElementById('sync-status').textContent='本地数据已是最新';
-      document.getElementById('sync-status').style.color='var(--text2)';
-    }else{
-      document.getElementById('sync-status').textContent='⚠ 本地数据更新，建议上传';
-      document.getElementById('sync-status').style.color='var(--warn)';
-    }
+    // Manual download always applies the data
+    applySyncData(data);
+    const now=Date.now();
+    localStorage.setItem('myNavLastSync',now);
+    localStorage.setItem('myNavLocalModified',now.toString());
+    document.getElementById('sync-last-time').textContent='上次同步：'+new Date(now).toLocaleString('zh-CN');
+    document.getElementById('sync-status').textContent='✅ 已从云端同步最新数据';
+    document.getElementById('sync-status').style.color='var(--success)';
+    toast('已从云端同步');
   }catch(e){
     document.getElementById('sync-status').textContent='❌ 云端暂无数据或网络错误';
     document.getElementById('sync-status').style.color='var(--danger)';
@@ -1473,11 +1472,18 @@ async function autoSync(){
     const file=await resp.json();
     const data=JSON.parse(decodeURIComponent(escape(atob(file.content))));
     const remoteTime=data.syncTime||0;
-    const localTime=parseInt(localStorage.getItem('myNavLastSync')||'0');
-    if(remoteTime>localTime){
+    const localModified=parseInt(localStorage.getItem('myNavLocalModified')||'0');
+    const localSync=parseInt(localStorage.getItem('myNavLastSync')||'0');
+    // Only overwrite local if cloud is newer than BOTH last sync AND last local edit
+    if(remoteTime>localSync && remoteTime>localModified){
       applySyncData(data);
-      localStorage.setItem('myNavLastSync',Date.now());
+      const now=Date.now();
+      localStorage.setItem('myNavLastSync',now);
+      localStorage.setItem('myNavLocalModified',now.toString());
       console.log('Auto-synced from cloud');
+    }else if(localModified>remoteTime && localModified>0){
+      // Local has unsaved changes, upload them
+      console.log('Local data is newer, will auto-upload');
     }
   }catch(e){}
 }
