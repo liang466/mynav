@@ -231,6 +231,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
   <nav class="sidebar-nav" id="sidebar-nav"></nav>
   <div class="sidebar-footer">
     <button class="sf-btn theme-btn" onclick="toggleTheme()" title="切换主题">🌙</button>
+    <button class="sf-btn" onclick="openSyncModal()" title="多设备同步">🔄</button>
     <button class="sf-btn" onclick="exportData()" title="导出数据">💾</button>
     <button class="sf-btn" onclick="document.getElementById('import-file').click()" title="导入">📂</button>
     <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
@@ -354,6 +355,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeFeishuModal()">取消</button>
       <button class="btn-save" onclick="saveFeishuKB()">保存</button>
+    </div>
+  </div>
+</div>
+<!-- Sync Modal -->
+<div class="overlay" id="sync-modal">
+  <div class="modal">
+    <h3>🔄 多设备同步</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6;">数据通过 GitHub 仓库云端存储，所有设备共享同一份数据。</p>
+    <label>GitHub Token（仅首次需要）</label>
+    <input type="password" id="f-sync-token" placeholder="粘贴 ghp_ 开头的 Token">
+    <div style="display:flex;gap:8px;margin-bottom:16px;">
+      <button onclick="saveSyncToken()" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);cursor:pointer;font-size:13px;color:var(--text);">保存 Token</button>
+      <span id="sync-token-status" style="font-size:12px;color:var(--text2);display:flex;align-items:center;"></span>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px;">
+      <button onclick="syncUp()" id="sync-up-btn" style="flex:1;padding:12px;border:none;border-radius:10px;background:var(--accent);color:#fff;cursor:pointer;font-size:14px;font-weight:600;">⬆ 上传到云端</button>
+      <button onclick="syncDown()" id="sync-down-btn" style="flex:1;padding:12px;border:none;border-radius:10px;background:var(--success);color:#fff;cursor:pointer;font-size:14px;font-weight:600;">⬇ 从云端下载</button>
+    </div>
+    <div id="sync-status" style="font-size:12px;color:var(--text2);text-align:center;margin-bottom:8px;"></div>
+    <div style="font-size:11px;color:var(--text2);text-align:center;padding-top:8px;border-top:1px solid var(--border);">
+      <span id="sync-last-time">从未同步</span>
+    </div>
+    <div class="modal-btns" style="margin-top:12px;">
+      <button class="btn-cancel" onclick="closeSyncModal()">关闭</button>
     </div>
   </div>
 </div>
@@ -1179,13 +1204,158 @@ document.getElementById('daily-note').addEventListener('input',function(){docume
 // ====== Keyboard ======
 document.addEventListener('keydown',(e)=>{
   const inInput=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
-  if(e.key==='Escape'){closeLinkModal();closeCatModal();closeFeishuModal();if(inInput)document.activeElement.blur();return;}
+  if(e.key==='Escape'){closeLinkModal();closeCatModal();closeFeishuModal();closeSyncModal();if(inInput)document.activeElement.blur();return;}
   if(inInput)return;
   if(e.key.toLowerCase()==='t')toggleTheme();
 });
 
+// ====== Cloud Sync ======
+const SYNC_REPO='liang466/mynav';
+const SYNC_FILE='data.json';
+
+function openSyncModal(){
+  document.getElementById('sync-modal').classList.add('show');
+  const token=localStorage.getItem('myNavSyncToken');
+  if(token){
+    document.getElementById('f-sync-token').value=token;
+    document.getElementById('sync-token-status').textContent='✅ 已保存';
+    document.getElementById('sync-token-status').style.color='var(--success)';
+  }else{
+    document.getElementById('sync-token-status').textContent='未设置';
+    document.getElementById('sync-token-status').style.color='var(--text2)';
+  }
+  const lastSync=localStorage.getItem('myNavLastSync');
+  if(lastSync){
+    const d=new Date(parseInt(lastSync));
+    document.getElementById('sync-last-time').textContent='上次同步：'+d.toLocaleString('zh-CN');
+  }
+}
+function closeSyncModal(){document.getElementById('sync-modal').classList.remove('show');}
+
+function saveSyncToken(){
+  const token=document.getElementById('f-sync-token').value.trim();
+  if(!token)return toast('请输入 Token');
+  localStorage.setItem('myNavSyncToken',token);
+  document.getElementById('sync-token-status').textContent='✅ 已保存';
+  document.getElementById('sync-token-status').style.color='var(--success)';
+  toast('Token 已保存');
+}
+
+function getSyncData(){
+  return {cats,catOrder,exams,notes,pomoData,timeline,customExprs,feishuKBs,feishuUrl,syncTime:Date.now()};
+}
+
+function applySyncData(data){
+  if(data.cats){cats=data.cats;cats.forEach(c=>c.links.forEach(l=>{if(l.tag===undefined)l.tag='';}));saveStore('myNavCats',cats);}
+  if(data.catOrder){catOrder=data.catOrder;saveStore('myNavCatOrder',catOrder);}
+  if(data.exams){exams=data.exams;saveStore('myNavExams',exams);}
+  if(data.notes){notes=data.notes;saveStore('myNavNotes',notes);}
+  if(data.pomoData){pomoData=data.pomoData;saveStore('myNavPomo',pomoData);}
+  if(data.timeline){timeline=data.timeline;saveStore('myNavTimeline',timeline);}
+  if(data.customExprs){customExprs=data.customExprs;saveStore('myNavCustomExprs',customExprs);}
+  if(data.feishuKBs){feishuKBs=data.feishuKBs;saveStore('myNavFeishuKBs',feishuKBs);}
+  if(data.feishuUrl){feishuUrl=data.feishuUrl;saveStore('myNavFeishu',feishuUrl);}
+  rebuildNavItems();renderNav();renderExams();renderExpr();renderTimeline();renderNotes();updatePomoStats();renderFeishuKBs();
+}
+
+async function syncUp(){
+  const token=document.getElementById('f-sync-token').value.trim()||localStorage.getItem('myNavSyncToken');
+  if(!token)return toast('请先设置 Token');
+  const btn=document.getElementById('sync-up-btn');
+  btn.disabled=true;btn.textContent='上传中...';
+  document.getElementById('sync-status').textContent='正在上传数据到云端...';
+  try{
+    const data=getSyncData();
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    let sha='';
+    try{
+      const r=await fetch('https://api.github.com/repos/'+SYNC_REPO+'/contents/'+SYNC_FILE,{
+        headers:{'Authorization':'token '+token}
+      });
+      if(r.ok){const f=await r.json();sha=f.sha;}
+    }catch(e){}
+    const body={message:'Sync '+new Date().toLocaleString('zh-CN'),content,branch:'main'};
+    if(sha)body.sha=sha;
+    const resp=await fetch('https://api.github.com/repos/'+SYNC_REPO+'/contents/'+SYNC_FILE,{
+      method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},body:JSON.stringify(body)
+    });
+    if(resp.ok){
+      const now=Date.now();
+      localStorage.setItem('myNavLastSync',now);
+      document.getElementById('sync-last-time').textContent='上次同步：'+new Date(now).toLocaleString('zh-CN');
+      document.getElementById('sync-status').textContent='✅ 上传成功';
+      document.getElementById('sync-status').style.color='var(--success)';
+      toast('数据已同步到云端');
+    }else{
+      document.getElementById('sync-status').textContent='❌ 上传失败，请检查 Token 权限';
+      document.getElementById('sync-status').style.color='var(--danger)';
+    }
+  }catch(e){
+    document.getElementById('sync-status').textContent='❌ 网络错误';
+    document.getElementById('sync-status').style.color='var(--danger)';
+  }
+  btn.disabled=false;btn.textContent='⬆ 上传到云端';
+}
+
+async function syncDown(){
+  const btn=document.getElementById('sync-down-btn');
+  btn.disabled=true;btn.textContent='下载中...';
+  document.getElementById('sync-status').textContent='正在从云端下载数据...';
+  try{
+    const token=localStorage.getItem('myNavSyncToken');
+    const headers=token?{'Authorization':'token '+token}:{};
+    const resp=await fetch('https://api.github.com/repos/'+SYNC_REPO+'/contents/'+SYNC_FILE,{headers});
+    if(!resp.ok)throw new Error('not found');
+    const file=await resp.json();
+    const data=JSON.parse(decodeURIComponent(escape(atob(file.content))));
+    const remoteTime=data.syncTime||0;
+    const localTime=parseInt(localStorage.getItem('myNavLastSync')||'0');
+    if(remoteTime>localTime||!localTime){
+      applySyncData(data);
+      const now=Date.now();
+      localStorage.setItem('myNavLastSync',now);
+      document.getElementById('sync-last-time').textContent='上次同步：'+new Date(now).toLocaleString('zh-CN');
+      document.getElementById('sync-status').textContent='✅ 已从云端同步最新数据';
+      document.getElementById('sync-status').style.color='var(--success)';
+      toast('已从云端同步');
+    }else if(remoteTime===localTime){
+      document.getElementById('sync-status').textContent='本地数据已是最新';
+      document.getElementById('sync-status').style.color='var(--text2)';
+    }else{
+      document.getElementById('sync-status').textContent='⚠ 本地数据更新，建议上传';
+      document.getElementById('sync-status').style.color='var(--warn)';
+    }
+  }catch(e){
+    document.getElementById('sync-status').textContent='❌ 云端暂无数据或网络错误';
+    document.getElementById('sync-status').style.color='var(--danger)';
+  }
+  btn.disabled=false;btn.textContent='⬇ 从云端下载';
+}
+
+// Auto sync on load (if token exists)
+async function autoSync(){
+  const token=localStorage.getItem('myNavSyncToken');
+  if(!token)return;
+  try{
+    const resp=await fetch('https://api.github.com/repos/'+SYNC_REPO+'/contents/'+SYNC_FILE,{
+      headers:{'Authorization':'token '+token}
+    });
+    if(!resp.ok)return;
+    const file=await resp.json();
+    const data=JSON.parse(decodeURIComponent(escape(atob(file.content))));
+    const remoteTime=data.syncTime||0;
+    const localTime=parseInt(localStorage.getItem('myNavLastSync')||'0');
+    if(remoteTime>localTime){
+      applySyncData(data);
+      localStorage.setItem('myNavLastSync',Date.now());
+      console.log('Auto-synced from cloud');
+    }
+  }catch(e){}
+}
+
 // ====== Init ======
 renderNav();renderExams();renderExpr();renderTimeline();renderNotes();updatePomoStats();renderFeishuKBs();
+autoSync();
 </script>
 </body>
 </html>
