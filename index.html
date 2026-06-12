@@ -231,35 +231,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
 .lock-btn{margin-top:16px;width:100%;padding:14px;border:none;border-radius:14px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:var(--tr);}
 .lock-btn:hover{background:var(--accent-h);}
 .lock-hint{font-size:12px;color:var(--text2);margin-top:12px;}
-/* ===== Ideas Module ===== */
-.ideas-section{background:var(--card-bg);border-radius:var(--radius);padding:22px;border:1px solid var(--border);box-shadow:var(--shadow);margin-bottom:24px;}
-.ideas-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
-.ideas-header h3{font-size:16px;font-weight:600;display:flex;align-items:center;gap:8px;}
-.ideas-add-btn{padding:6px 14px;border:1px dashed var(--accent);border-radius:10px;background:transparent;color:var(--accent);cursor:pointer;font-size:13px;font-weight:600;transition:var(--tr);}
-.ideas-add-btn:hover{background:var(--accent-light);}
-.ideas-filter{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
-.ideas-filter-btn{padding:4px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text2);cursor:pointer;font-size:12px;transition:var(--tr);}
-.ideas-filter-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
-.ideas-filter-btn:hover:not(.active){background:var(--bg);}
-.idea-card{padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--bg);margin-bottom:10px;transition:var(--tr);cursor:default;}
-.idea-card:hover{border-color:var(--accent);box-shadow:var(--shadow);}
-.idea-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
-.idea-title{font-size:15px;font-weight:600;color:var(--text);}
-.idea-status{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap;}
-.idea-status.s-idea{background:rgba(102,126,234,0.12);color:#667eea;}
-.idea-status.s-research{background:rgba(255,183,77,0.15);color:#f57c00;}
-.idea-status.s-exec{background:rgba(76,175,80,0.12);color:#2e7d32;}
-.idea-status.s-drop{background:rgba(0,0,0,0.08);color:#999;text-decoration:line-through;}
-.idea-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px;}
-.idea-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--text3);}
-.idea-tag{padding:2px 8px;border-radius:6px;background:var(--accent-light);color:var(--accent);font-weight:500;}
-.idea-link{color:var(--accent);text-decoration:none;word-break:break-all;}
-.idea-link:hover{text-decoration:underline;}
-.idea-actions{display:flex;gap:6px;margin-top:8px;}
-.idea-actions button{padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);color:var(--text2);cursor:pointer;font-size:11px;transition:var(--tr);}
-.idea-actions button:hover{border-color:var(--accent);color:var(--accent);}
-.idea-actions button.del:hover{border-color:var(--danger);color:var(--danger);}
-.ideas-empty{text-align:center;padding:30px 0;color:var(--text3);font-size:13px;}
 </style>
 </head>
 <body>
@@ -336,21 +307,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
         <button onclick="switchExpr('custom',this)">自定义</button>
       </div>
     </div>
-  </div>
-  <!-- Business Ideas -->
-  <div class="ideas-section">
-    <div class="ideas-header">
-      <h3>💡 商业灵感</h3>
-      <button class="ideas-add-btn" onclick="openIdeaModal()">+ 记录灵感</button>
-    </div>
-    <div class="ideas-filter" id="ideas-filter">
-      <button class="ideas-filter-btn active" onclick="filterIdeas('all',this)">全部</button>
-      <button class="ideas-filter-btn" onclick="filterIdeas('idea',this)">💭 想法</button>
-      <button class="ideas-filter-btn" onclick="filterIdeas('research',this)">🔍 调研中</button>
-      <button class="ideas-filter-btn" onclick="filterIdeas('exec',this)">🚀 执行中</button>
-      <button class="ideas-filter-btn" onclick="filterIdeas('drop',this)">🗑 已放弃</button>
-    </div>
-    <div id="ideas-list"></div>
   </div>
   <!-- 4-Day Timeline -->
   <div class="timeline-section">
@@ -449,33 +405,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
     </div>
     <div class="modal-btns" style="margin-top:12px;">
       <button class="btn-cancel" onclick="closeSyncModal()">关闭</button>
-    </div>
-  </div>
-</div>
-
-<!-- Idea Modal -->
-<div class="overlay" id="idea-modal">
-  <div class="modal">
-    <h3 id="idea-modal-title">记录灵感</h3>
-    <input type="hidden" id="f-idea-edit-idx" value="-1">
-    <label>标题</label>
-    <input type="text" id="f-idea-title" placeholder="例：Gemini视频批量生产方案">
-    <label>详细描述</label>
-    <textarea id="f-idea-desc" placeholder="描述你的想法、执行思路、所需资源等..." style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:14px;margin-bottom:14px;background:var(--bg);color:var(--text);outline:none;resize:vertical;min-height:80px;font-family:inherit;transition:var(--tr);"></textarea>
-    <label>状态</label>
-    <select id="f-idea-status">
-      <option value="idea">💭 想法</option>
-      <option value="research">🔍 调研中</option>
-      <option value="exec">🚀 执行中</option>
-      <option value="drop">🗑 已放弃</option>
-    </select>
-    <label>标签（逗号分隔）</label>
-    <input type="text" id="f-idea-tags" placeholder="例：AI视频, Gemini, 变现">
-    <label>参考链接（可选）</label>
-    <input type="url" id="f-idea-link" placeholder="https://...">
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeIdeaModal()">取消</button>
-      <button class="btn-save" onclick="saveIdea()">保存</button>
     </div>
   </div>
 </div>
@@ -1442,7 +1371,7 @@ function saveSyncToken(){
 }
 
 function getSyncData(){
-  return {cats,catOrder,exams,notes,pomoData,timeline,customExprs,feishuKBs,feishuUrl,ideas,syncTime:Date.now()};
+  return {cats,catOrder,exams,notes,pomoData,timeline,customExprs,feishuKBs,feishuUrl,syncTime:Date.now()};
 }
 
 function applySyncData(data){
@@ -1455,8 +1384,7 @@ function applySyncData(data){
   if(data.customExprs){customExprs=data.customExprs;saveStore('myNavCustomExprs',customExprs);}
   if(data.feishuKBs){feishuKBs=data.feishuKBs;saveStore('myNavFeishuKBs',feishuKBs);}
   if(data.feishuUrl){feishuUrl=data.feishuUrl;saveStore('myNavFeishu',feishuUrl);}
-  if(data.ideas){ideas=data.ideas;saveStore('myNavIdeas',ideas);}
-  rebuildNavItems();renderNav();renderExams();renderExpr();renderTimeline();renderNotes();updatePomoStats();renderFeishuKBs();renderIdeas();
+  rebuildNavItems();renderNav();renderExams();renderExpr();renderTimeline();renderNotes();updatePomoStats();renderFeishuKBs();
 }
 
 async function syncUp(){
@@ -1554,114 +1482,8 @@ async function autoSync(){
   }catch(e){}
 }
 
-// ====== Ideas Module ======
-let ideas=loadStore('myNavIdeas',[]);
-let ideaFilter='all';
-
-function renderIdeas(){
-  const list=document.getElementById('ideas-list');
-  if(!list)return;
-  let filtered=ideaFilter==='all'?ideas:ideas.filter(i=>i.status===ideaFilter);
-  if(filtered.length===0){
-    list.innerHTML='<div class="ideas-empty">暂无灵感，点击右上角记录你的第一个想法 ✨</div>';
-    return;
-  }
-  list.innerHTML=filtered.map((idea,i)=>{
-    const realIdx=ideas.indexOf(idea);
-    const statusMap={idea:'💭 想法',research:'🔍 调研中',exec:'🚀 执行中',drop:'🗑 已放弃'};
-    const tags=(idea.tags||[]).map(t=>`<span class="idea-tag">${esc(t)}</span>`).join('');
-    const link=idea.link?`<a class="idea-link" href="${esc(idea.link)}" target="_blank" rel="noopener">${esc(idea.link)}</a>`:'';
-    const date=idea.createdAt?new Date(idea.createdAt).toLocaleDateString('zh-CN',{month:'short',day:'numeric'}):'';
-    return `<div class="idea-card" data-status="${idea.status}">
-      <div class="idea-top">
-        <div class="idea-title">${esc(idea.title)}</div>
-        <span class="idea-status s-${idea.status}">${statusMap[idea.status]||idea.status}</span>
-      </div>
-      ${idea.desc?`<div class="idea-desc">${esc(idea.desc).replace(/\n/g,'<br>')}</div>`:''}
-      <div class="idea-meta">
-        ${tags}${link?`<span>·</span>${link}`:''}${date?`<span>·</span><span>${date}</span>`:''}
-      </div>
-      <div class="idea-actions">
-        <button onclick="openIdeaEdit(${realIdx})">✏️ 编辑</button>
-        <button onclick="cycleIdeaStatus(${realIdx})">🔄 切换状态</button>
-        <button class="del" onclick="deleteIdea(${realIdx})">🗑 删除</button>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function filterIdeas(f,btn){
-  ideaFilter=f;
-  document.querySelectorAll('.ideas-filter-btn').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
-  renderIdeas();
-}
-
-function openIdeaModal(){
-  document.getElementById('idea-modal-title').textContent='记录灵感';
-  document.getElementById('f-idea-edit-idx').value='-1';
-  document.getElementById('f-idea-title').value='';
-  document.getElementById('f-idea-desc').value='';
-  document.getElementById('f-idea-status').value='idea';
-  document.getElementById('f-idea-tags').value='';
-  document.getElementById('f-idea-link').value='';
-  document.getElementById('idea-modal').classList.add('show');
-}
-
-function openIdeaEdit(idx){
-  const idea=ideas[idx];
-  if(!idea)return;
-  document.getElementById('idea-modal-title').textContent='编辑灵感';
-  document.getElementById('f-idea-edit-idx').value=idx;
-  document.getElementById('f-idea-title').value=idea.title;
-  document.getElementById('f-idea-desc').value=idea.desc||'';
-  document.getElementById('f-idea-status').value=idea.status;
-  document.getElementById('f-idea-tags').value=(idea.tags||[]).join(', ');
-  document.getElementById('f-idea-link').value=idea.link||'';
-  document.getElementById('idea-modal').classList.add('show');
-}
-
-function closeIdeaModal(){document.getElementById('idea-modal').classList.remove('show');}
-
-function saveIdea(){
-  const title=document.getElementById('f-idea-title').value.trim();
-  if(!title)return toast('请输入标题');
-  const desc=document.getElementById('f-idea-desc').value.trim();
-  const status=document.getElementById('f-idea-status').value;
-  const tags=document.getElementById('f-idea-tags').value.split(/[,，]/).map(t=>t.trim()).filter(Boolean);
-  const link=document.getElementById('f-idea-link').value.trim();
-  const idx=parseInt(document.getElementById('f-idea-edit-idx').value);
-  if(idx>=0){
-    ideas[idx]={...ideas[idx],title,desc,status,tags,link,updatedAt:Date.now()};
-  }else{
-    ideas.unshift({title,desc,status,tags,link,createdAt:Date.now()});
-  }
-  saveStore('myNavIdeas',ideas);
-  closeIdeaModal();
-  renderIdeas();
-  toast(idx>=0?'灵感已更新':'灵感已记录');
-}
-
-function deleteIdea(idx){
-  if(!confirm('确定删除这条灵感？'))return;
-  ideas.splice(idx,1);
-  saveStore('myNavIdeas',ideas);
-  renderIdeas();
-}
-
-function cycleIdeaStatus(idx){
-  const order=['idea','research','exec','drop'];
-  const cur=ideas[idx].status;
-  ideas[idx].status=order[(order.indexOf(cur)+1)%order.length];
-  ideas[idx].updatedAt=Date.now();
-  saveStore('myNavIdeas',ideas);
-  renderIdeas();
-}
-
-function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
-
 // ====== Init ======
-renderNav();renderExams();renderExpr();renderTimeline();renderNotes();updatePomoStats();renderFeishuKBs();renderIdeas();
+renderNav();renderExams();renderExpr();renderTimeline();renderNotes();updatePomoStats();renderFeishuKBs();
 autoSync().then(()=>{_autoUploadReady=true;});
 // Re-sync when page becomes visible (switching tabs, unlocking phone)
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)silentDownload();});
