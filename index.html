@@ -436,7 +436,57 @@ const DEFAULT_CATS=[
 
 // ====== Data ======
 function loadStore(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
-function saveStore(k,v){localStorage.setItem(k,JSON.stringify(v));}
+function saveStore(k,v){localStorage.setItem(k,JSON.stringify(v));scheduleAutoUpload();}
+let _autoUploadReady=false;
+let _autoUploadTimer=null;
+function scheduleAutoUpload(){
+  if(!_autoUploadReady)return;
+  clearTimeout(_autoUploadTimer);
+  _autoUploadTimer=setTimeout(()=>{_autoUploadTimer=null;silentUpload();},8000);
+}
+async function silentUpload(){
+  const token=localStorage.getItem('myNavSyncToken');
+  if(!token)return;
+  try{
+    const data=getSyncData();
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+    let sha='';
+    try{
+      const r=await fetch('https://api.github.com/repos/'+SYNC_REPO+'/contents/'+SYNC_FILE,{
+        headers:{'Authorization':'token '+token}
+      });
+      if(r.ok){const f=await r.json();sha=f.sha;}
+    }catch(e){return;}
+    const body={message:'Auto sync '+new Date().toLocaleString('zh-CN'),content,branch:'main'};
+    if(sha)body.sha=sha;
+    const resp=await fetch('https://api.github.com/repos/'+SYNC_REPO+'/contents/'+SYNC_FILE,{
+      method:'PUT',headers:{'Authorization':'token '+token,'Content-Type':'application/json'},body:JSON.stringify(body)
+    });
+    if(resp.ok){
+      localStorage.setItem('myNavLastSync',Date.now());
+      console.log('Auto-uploaded at',new Date().toLocaleTimeString('zh-CN'));
+    }
+  }catch(e){console.log('Auto-upload failed:',e);}
+}
+async function silentDownload(){
+  const token=localStorage.getItem('myNavSyncToken');
+  if(!token)return;
+  try{
+    const resp=await fetch('https://api.github.com/repos/'+SYNC_REPO+'/contents/'+SYNC_FILE,{
+      headers:{'Authorization':'token '+token}
+    });
+    if(!resp.ok)return;
+    const file=await resp.json();
+    const data=JSON.parse(decodeURIComponent(escape(atob(file.content))));
+    const remoteTime=data.syncTime||0;
+    const localTime=parseInt(localStorage.getItem('myNavLastSync')||'0');
+    if(remoteTime>localTime){
+      applySyncData(data);
+      localStorage.setItem('myNavLastSync',Date.now());
+      console.log('Auto-downloaded at',new Date().toLocaleTimeString('zh-CN'));
+    }
+  }catch(e){}
+}
 let cats=loadStore('myNavCats',DEFAULT_CATS);
 // Migrate: ensure all links have tag field
 cats.forEach(c=>c.links.forEach(l=>{if(l.tag===undefined)l.tag='';}));
@@ -1355,7 +1405,11 @@ async function autoSync(){
 
 // ====== Init ======
 renderNav();renderExams();renderExpr();renderTimeline();renderNotes();updatePomoStats();renderFeishuKBs();
-autoSync();
+autoSync().then(()=>{_autoUploadReady=true;});
+// Re-sync when page becomes visible (switching tabs, unlocking phone)
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)silentDownload();});
+// Periodic sync every 5 minutes
+setInterval(()=>{silentDownload();},300000);
 </script>
 </body>
 </html>
