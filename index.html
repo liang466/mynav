@@ -217,9 +217,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
   .timeline-grid{grid-template-columns:1fr;}
   .exam-bar{display:none;}
 }
+/* Lock Screen */
+.lock-screen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:var(--bg);transition:opacity .4s;}
+.lock-screen.unlocked{opacity:0;pointer-events:none;}
+.lock-box{text-align:center;padding:40px;max-width:360px;width:90%;}
+.lock-icon{font-size:48px;margin-bottom:16px;}
+.lock-title{font-size:20px;font-weight:700;margin-bottom:8px;}
+.lock-sub{font-size:13px;color:var(--text2);margin-bottom:24px;}
+.lock-input{width:100%;padding:14px 18px;border:2px solid var(--border);border-radius:14px;font-size:16px;text-align:center;background:var(--card-bg);color:var(--text);outline:none;transition:var(--tr);letter-spacing:2px;}
+.lock-input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(67,97,238,0.12);}
+.lock-input.shake{animation:shake .4s;border-color:var(--danger);}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+.lock-btn{margin-top:16px;width:100%;padding:14px;border:none;border-radius:14px;background:var(--accent);color:#fff;font-size:15px;font-weight:600;cursor:pointer;transition:var(--tr);}
+.lock-btn:hover{background:var(--accent-h);}
+.lock-hint{font-size:12px;color:var(--text2);margin-top:12px;}
 </style>
 </head>
 <body>
+
+<!-- ===== Lock Screen ===== -->
+<div class="lock-screen" id="lock-screen">
+  <div class="lock-box">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-title" id="lock-title">请输入密码</div>
+    <div class="lock-sub" id="lock-sub">此页面已设置访问密码</div>
+    <input type="password" class="lock-input" id="lock-input" placeholder="输入密码" autocomplete="off">
+    <button class="lock-btn" id="lock-btn" onclick="checkLock()">进入</button>
+    <div class="lock-hint" id="lock-hint"></div>
+  </div>
+</div>
 
 <!-- ===== Sidebar ===== -->
 <aside class="sidebar">
@@ -386,6 +412,59 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
 <div class="toast" id="toast"></div>
 
 <script>
+// ====== Lock Screen ======
+async function hashPwd(pwd){
+  const buf=new TextEncoder().encode(pwd);
+  const hash=await crypto.subtle.digest('SHA-256',buf);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+function initLock(){
+  const hasPwd=localStorage.getItem('myNavPwdHash');
+  const unlocked=sessionStorage.getItem('myNavUnlocked');
+  if(!hasPwd){
+    document.getElementById('lock-title').textContent='设置访问密码';
+    document.getElementById('lock-sub').textContent='首次访问，请设置一个密码';
+    document.getElementById('lock-btn').textContent='设置密码';
+    document.getElementById('lock-btn').onclick=setLock;
+    document.getElementById('lock-hint').textContent='密码保存在本地，清除浏览器数据可重置';
+  }
+  if(unlocked==='1'){
+    document.getElementById('lock-screen').classList.add('unlocked');
+    setTimeout(()=>{document.getElementById('lock-screen').style.display='none';},400);
+  }
+}
+function unlockScreen(){
+  sessionStorage.setItem('myNavUnlocked','1');
+  const ls=document.getElementById('lock-screen');
+  ls.classList.add('unlocked');
+  setTimeout(()=>{ls.style.display='none';},400);
+}
+async function setLock(){
+  const input=document.getElementById('lock-input');
+  const pwd=input.value.trim();
+  if(pwd.length<4){input.classList.add('shake');setTimeout(()=>input.classList.remove('shake'),400);return;}
+  const h=await hashPwd(pwd);
+  localStorage.setItem('myNavPwdHash',h);
+  unlockScreen();
+}
+async function checkLock(){
+  const input=document.getElementById('lock-input');
+  const pwd=input.value;
+  const stored=localStorage.getItem('myNavPwdHash');
+  if(!stored){unlockScreen();return;}
+  const h=await hashPwd(pwd);
+  if(h===stored){unlockScreen();}
+  else{input.classList.add('shake');input.value='';setTimeout(()=>input.classList.remove('shake'),400);}
+}
+document.getElementById('lock-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    const hasPwd=localStorage.getItem('myNavPwdHash');
+    if(hasPwd)checkLock();
+    else setLock();
+  }
+});
+initLock();
+
 // ====== Constants ======
 const COLORS=['linear-gradient(135deg,#667eea,#764ba2)','linear-gradient(135deg,#11998e,#38ef7d)','linear-gradient(135deg,#f093fb,#f5576c)','linear-gradient(135deg,#4facfe,#00f2fe)','linear-gradient(135deg,#fa709a,#fee140)','linear-gradient(135deg,#a8edea,#fed6e3)','linear-gradient(135deg,#fbc2eb,#a6c1ee)','linear-gradient(135deg,#ff9a9e,#fecfef)','linear-gradient(135deg,#a18cd1,#fbc2eb)','linear-gradient(135deg,#f6d365,#fda085)'];
 const EMOJIS=['🤖','💻','🔧','📚','📰','🏠','🎨','🎵','🎮','📷','🛒','💰','🔬','🌐','📊','⚡','🎯','📱','🖥️','🧪'];
