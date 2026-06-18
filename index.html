@@ -262,11 +262,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
 .res-page{padding:0;}
 .res-layout{display:flex;gap:20px;min-height:500px;}
 .res-sidebar{width:160px;flex-shrink:0;}
-.res-subject{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:14px;color:var(--text2);transition:var(--tr);margin-bottom:4px;font-weight:500;}
+.res-subject{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;cursor:pointer;font-size:14px;color:var(--text2);transition:var(--tr);margin-bottom:4px;font-weight:500;position:relative;user-select:none;}
 .res-subject:hover{background:var(--accent-light);color:var(--accent);}
 .res-subject.active{background:var(--accent);color:#fff;font-weight:600;}
 .res-subject .res-count{margin-left:auto;font-size:11px;background:var(--accent-light);color:var(--accent);padding:1px 6px;border-radius:6px;}
 .res-subject.active .res-count{background:rgba(255,255,255,0.2);color:#fff;}
+.res-subject.cat-drag{cursor:grab;}.res-subject.cat-drag:active{cursor:grabbing;}
+.res-subject.dragging{opacity:0.4;transform:scale(0.95);}
+.res-subject.drag-over-sub{border-top:2px solid var(--accent);margin-top:-2px;}
+.res-sub-actions{display:none;gap:2px;margin-left:4px;}
+.res-subject:hover .res-sub-actions{display:flex;}
+.res-subject.active .res-sub-actions{display:flex;}
+.res-sub-btn{width:20px;height:20px;border:none;border-radius:4px;background:transparent;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:var(--tr);color:inherit;opacity:0.6;padding:0;}
+.res-sub-btn:hover{opacity:1;background:rgba(0,0,0,0.1);}
+.res-subject.active .res-sub-btn{color:#fff;}
+.res-subject.active .res-sub-btn:hover{background:rgba(255,255,255,0.2);}
+.res-backup-btn{padding:8px 16px;border:1px dashed var(--accent);border-radius:10px;background:var(--accent-light);cursor:pointer;font-size:12px;color:var(--accent);font-weight:600;transition:var(--tr);margin-top:8px;text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;}
+.res-backup-btn:hover{background:var(--accent);color:#fff;}
 .res-subject-add{padding:8px 14px;border:1px dashed var(--border);border-radius:10px;cursor:pointer;font-size:12px;color:var(--text2);text-align:center;transition:var(--tr);margin-top:8px;}
 .res-subject-add:hover{border-color:var(--accent);color:var(--accent);}
 .res-main{flex:1;}
@@ -529,9 +541,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
         <button style="padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);cursor:pointer;font-size:12px;color:var(--text2);" onclick="manageSubCats()">管理子分类</button>
       </div>
       <div class="res-upload-zone" id="res-upload-zone" onclick="document.getElementById('res-file-input').click()">
-        📎 拖拽文件到此处上传（PDF/Word），或点击选择文件
+        📎 拖拽文件到此处上传（PDF/Word/HTML/PPT/图片等），或点击选择文件
       </div>
-      <input type="file" id="res-file-input" accept=".pdf,.doc,.docx" style="display:none" onchange="handleFileUpload(event)" multiple>
+      <input type="file" id="res-file-input" accept=".pdf,.doc,.docx,.html,.htm,.ppt,.pptx,.xls,.xlsx,.txt,.md,.zip,.png,.jpg,.jpeg,.gif,.svg" style="display:none" onchange="handleFileUpload(event)" multiple>
       <div class="res-grid" id="res-grid"></div>
     </div>
   </div>
@@ -1651,9 +1663,92 @@ function renderResSubjects(){
   if(!el)return;
   el.innerHTML=resSubjects.map((s,i)=>{
     const count=resLinks.filter(r=>r.subject===s).length;
-    return `<div class="res-subject ${i===activeResSubject?'active':''}" onclick="switchResSubject(${i})">${s}<span class="res-count">${count}</span></div>`;
-  }).join('')+`<div class="res-subject-add" onclick="addResSubject()">+ 添加科目</div>`;
+    return `<div class="res-subject cat-drag ${i===activeResSubject?'active':''}" draggable="true" data-sub-idx="${i}"
+      onclick="switchResSubject(${i})"
+      ondragstart="onSubDragStart(event,${i})" ondragend="onSubDragEnd(event)"
+      ondragover="onSubDragOver(event,${i})" ondragleave="onSubDragLeave(event)" ondrop="onSubDrop(event,${i})">
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(s)}</span>
+      <span class="res-count">${count}</span>
+      <span class="res-sub-actions">
+        <button class="res-sub-btn" onclick="event.stopPropagation();renameResSubject(${i})" title="重命名">✏️</button>
+        <button class="res-sub-btn" onclick="event.stopPropagation();delResSubject(${i})" title="删除">✕</button>
+      </span>
+    </div>`;
+  }).join('')+`<div class="res-subject-add" onclick="addResSubject()">+ 添加科目</div>
+  <div class="res-backup-btn" onclick="backupAllResources()">📦 一键备份</div>
+  <div class="res-backup-btn" onclick="document.getElementById('res-restore-input').click()" style="border-style:solid;border-color:var(--success);color:var(--success);background:transparent;">📂 恢复备份</div>
+  <input type="file" id="res-restore-input" accept=".json" style="display:none" onchange="restoreAllResources(event)">`;
   renderSubCats();
+}
+
+// Subject drag-and-drop
+let _subDragIdx=-1;
+function onSubDragStart(e,i){_subDragIdx=i;e.currentTarget.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','sub');}
+function onSubDragEnd(e){e.currentTarget.classList.remove('dragging');document.querySelectorAll('.res-subject.drag-over-sub').forEach(el=>el.classList.remove('drag-over-sub'));_subDragIdx=-1;}
+function onSubDragOver(e,i){e.preventDefault();if(i!==_subDragIdx)e.currentTarget.classList.add('drag-over-sub');}
+function onSubDragLeave(e){e.currentTarget.classList.remove('drag-over-sub');}
+function onSubDrop(e,i){
+  e.preventDefault();e.currentTarget.classList.remove('drag-over-sub');
+  if(_subDragIdx<0||_subDragIdx===i)return;
+  const moved=resSubjects.splice(_subDragIdx,1)[0];
+  resSubjects.splice(i>_subDragIdx?i-1:i,0,moved);
+  // Also move associated sub-categories
+  // activeResSubject needs update if it was the moved one
+  if(activeResSubject===_subDragIdx)activeResSubject=i>_subDragIdx?i-1:i;
+  else if(_subDragIdx<activeResSubject&&i>=activeResSubject)activeResSubject--;
+  else if(_subDragIdx>activeResSubject&&i<=activeResSubject)activeResSubject++;
+  saveStore('myNavResSubjects',resSubjects);
+  renderResSubjects();renderResGrid();
+  toast('科目顺序已调整');
+}
+
+function renameResSubject(i){
+  const old=resSubjects[i];
+  const name=prompt('重命名科目：',old);
+  if(!name||!name.trim()||name.trim()===old)return;
+  const newName=name.trim();
+  // Update subject name in resSubjects
+  resSubjects[i]=newName;
+  // Update all links referencing this subject
+  resLinks.forEach(r=>{if(r.subject===old)r.subject=newName;});
+  // Update subCats key
+  if(resSubCats[old]){resSubCats[newName]=resSubCats[old];delete resSubCats[old];}
+  saveStore('myNavResSubjects',resSubjects);
+  saveStore('myNavResLinks',resLinks);
+  saveStore('myNavResSubCats',resSubCats);
+  renderResSubjects();renderResGrid();
+  toast('科目已重命名');
+}
+
+function delResSubject(i){
+  const name=resSubjects[i];
+  const count=resLinks.filter(r=>r.subject===name).length;
+  if(resSubjects.length<=1)return toast('至少保留一个科目');
+  const action=prompt(`删除科目「${name}」（含 ${count} 个资源）\n\n输入 "1" = 将资源移到「${resSubjects[i===0?1:0]}」\n输入 "2" = 删除该科目下所有资源\n输入其他 = 取消`);
+  if(action==='1'){
+    const target=resSubjects[i===0?1:0];
+    resLinks.forEach(r=>{if(r.subject===name)r.subject=target;});
+    // Merge sub-cats
+    if(resSubCats[name]){
+      if(!resSubCats[target])resSubCats[target]=[];
+      resSubCats[name].forEach(sc=>{if(!resSubCats[target].includes(sc))resSubCats[target].push(sc);});
+      delete resSubCats[name];
+    }
+    saveStore('myNavResLinks',resLinks);
+    saveStore('myNavResSubCats',resSubCats);
+  }else if(action==='2'){
+    // Delete file entries from IndexedDB too
+    resLinks.filter(r=>r.subject===name&&r.type==='file').forEach(r=>deleteFile(r.id));
+    resLinks=resLinks.filter(r=>r.subject!==name);
+    delete resSubCats[name];
+    saveStore('myNavResLinks',resLinks);
+    saveStore('myNavResSubCats',resSubCats);
+  }else{return;}
+  resSubjects.splice(i,1);
+  if(activeResSubject>=resSubjects.length)activeResSubject=resSubjects.length-1;
+  saveStore('myNavResSubjects',resSubjects);
+  renderResSubjects();renderResGrid();
+  toast('科目已删除');
 }
 
 function switchResSubject(i){activeResSubject=i;activeSubCat='';resStatusFilter='';const sf=document.getElementById('res-status-filter');if(sf)sf.value='';renderResSubjects();renderResGrid();}
@@ -1730,7 +1825,7 @@ function renderResGrid(){
     const stLabel=st==='done'?'📗已看完':st==='reading'?'📖在看':'📕未看';
     const stClass=st==='done'?'res-status-done':st==='reading'?'res-status-reading':'res-status-unread';
     return `<div class="res-card" onclick="${r.type==='file'?`previewResFile('${r.id}')`:`window.open('${esc(r.url)}','_blank')`}">
-    <div class="card-actions"><button class="card-btn edit" onclick="event.stopPropagation();editResLink('${r.id}')" title="编辑">✏️</button><button class="card-btn del" onclick="event.stopPropagation();delResLink('${r.id}')" title="删除">✕</button></div>
+    <div class="card-actions"><button class="card-btn edit" onclick="event.stopPropagation();moveResToSubject('${r.id}')" title="移动科目">📂</button><button class="card-btn edit" onclick="event.stopPropagation();editResLink('${r.id}')" title="编辑">✏️</button><button class="card-btn del" onclick="event.stopPropagation();delResLink('${r.id}')" title="删除">✕</button></div>
     <div class="res-card-icon">${r.type==='file'?'📄':getPlatformIcon(r.url)}</div>
     <div class="res-card-title">${esc(r.title)}</div>
     ${r.desc?`<div class="res-card-desc">${esc(r.desc)}</div>`:''}
@@ -1846,6 +1941,10 @@ async function previewResFile(id){
     const url=URL.createObjectURL(blob);
     if(file.type==='application/pdf'||r.title.endsWith('.pdf')){
       body.innerHTML=`<iframe src="${url}"></iframe>`;
+    }else if(r.title.endsWith('.html')||r.title.endsWith('.htm')||file.type==='text/html'){
+      body.innerHTML=`<iframe src="${url}"></iframe>`;
+    }else if(r.title.match(/\.(png|jpg|jpeg|gif|svg|webp)$/i)){
+      body.innerHTML=`<div style="padding:20px;text-align:center;"><img src="${url}" style="max-width:100%;max-height:80vh;border-radius:10px;"></div>`;
     }else{
       body.innerHTML=`<div style="padding:40px;text-align:center;"><p style="font-size:18px;margin-bottom:16px;">📄 ${esc(r.title)}</p><a href="${url}" download="${esc(r.title)}" style="padding:12px 24px;background:var(--accent);color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">下载文件</a></div>`;
     }
@@ -1972,6 +2071,94 @@ async function quickAddResources(){
     toast('这些链接已经存在了');
   }
   input.value='';
+}
+
+// ====== Backup & Restore All Resources ======
+async function backupAllResources(){
+  toast('正在打包备份...');
+  const fileEntries=resLinks.filter(r=>r.type==='file');
+  const filesData=[];
+  for(const entry of fileEntries){
+    try{
+      const file=await getFile(entry.id);
+      if(file){
+        const bytes=new Uint8Array(file.data);
+        let binary='';for(let i=0;i<bytes.length;i++)binary+=String.fromCharCode(bytes[i]);
+        filesData.push({id:entry.id,name:file.name,type:file.type,base64:btoa(binary)});
+      }
+    }catch(e){console.log('Backup skip:',entry.id);}
+  }
+  const backup={
+    _backup:true,
+    _version:2,
+    _date:new Date().toISOString(),
+    resSubjects,
+    resLinks,
+    resSubCats,
+    files:filesData
+  };
+  const blob=new Blob([JSON.stringify(backup)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='mynav-resources-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();
+  toast(`备份完成：${resLinks.length} 个资源 + ${filesData.length} 个文件`);
+}
+
+async function restoreAllResources(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=async(ev)=>{
+    try{
+      const backup=JSON.parse(ev.target.result);
+      if(!backup._backup||!backup.resSubjects)return alert('这不是有效的备份文件');
+      if(!confirm(`即将恢复 ${backup.resLinks.length} 个资源和 ${(backup.files||[]).length} 个文件。\n当前资源将被合并，是否继续？`))return;
+      // Merge subjects
+      backup.resSubjects.forEach(s=>{if(!resSubjects.includes(s))resSubjects.push(s);});
+      // Merge sub-cats
+      if(backup.resSubCats){
+        Object.keys(backup.resSubCats).forEach(subj=>{
+          if(!resSubCats[subj])resSubCats[subj]=[];
+          backup.resSubCats[subj].forEach(sc=>{if(!resSubCats[subj].includes(sc))resSubCats[subj].push(sc);});
+        });
+        saveStore('myNavResSubCats',resSubCats);
+      }
+      // Restore files to IndexedDB
+      if(backup.files){
+        for(const f of backup.files){
+          try{
+            const binary=atob(f.base64);
+            const bytes=new Uint8Array(binary.length);
+            for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+            await storeFile(f.id,f.name,f.type,bytes.buffer);
+          }catch(err){console.log('File restore skip:',f.id);}
+        }
+      }
+      // Merge links (skip duplicates by ID)
+      const existIds=new Set(resLinks.map(r=>r.id));
+      backup.resLinks.forEach(r=>{if(!existIds.has(r.id))resLinks.push(r);});
+      saveStore('myNavResSubjects',resSubjects);
+      saveStore('myNavResLinks',resLinks);
+      renderResSubjects();renderResGrid();
+      toast('备份已恢复！');
+    }catch(err){alert('备份文件格式错误');}
+  };
+  reader.readAsText(file);e.target.value='';
+}
+
+// Move resource to another subject
+function moveResToSubject(id){
+  const r=resLinks.find(x=>x.id===id);if(!r)return;
+  const others=resSubjects.filter(s=>s!==r.subject);
+  if(others.length===0)return toast('没有其他科目可移动');
+  const target=prompt('将「'+r.title+'」移动到：\n\n'+others.map((s,i)=>(i+1)+'. '+s).join('\n')+'\n\n输入序号：');
+  if(!target)return;
+  const idx=parseInt(target)-1;
+  if(isNaN(idx)||idx<0||idx>=others.length)return toast('无效选择');
+  r.subject=others[idx];
+  saveStore('myNavResLinks',resLinks);
+  renderResSubjects();renderResGrid();
+  toast('已移动到「'+others[idx]+'」');
 }
 
 // ====== Navigation (with drag reorder) ======
