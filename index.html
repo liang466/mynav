@@ -309,6 +309,84 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
 .carryover-item input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent);}
 .carryover-item label{flex:1;font-size:13px;cursor:pointer;}
 .carryover-day{font-size:12px;color:var(--accent);font-weight:600;margin-top:10px;margin-bottom:6px;padding:4px 8px;background:var(--accent-light);border-radius:6px;display:inline-block;}
+/* ===== Edit Mode ===== */
+.edit-toolbar{display:none;align-items:center;gap:10px;padding:12px 18px;background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--radius);margin-bottom:18px;flex-wrap:wrap;}
+.edit-toolbar.show{display:flex;}
+.edit-toolbar .et-title{font-size:14px;font-weight:600;color:var(--accent);}
+.edit-toolbar button{padding:8px 16px;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-weight:600;transition:var(--tr);}
+.edit-toolbar .et-add{background:var(--accent);color:#fff;}
+.edit-toolbar .et-add:hover{background:var(--accent-h);}
+.edit-toolbar .et-done{background:var(--success);color:#fff;}
+.edit-toolbar .et-done:hover{opacity:0.9;}
+.board-wrapper{position:relative;transition:var(--tr);}
+.board-wrapper.edit-mode{outline:2px dashed var(--accent);outline-offset:4px;border-radius:var(--radius);}
+.board-wrapper.dragging{opacity:0.4;transform:scale(0.97);}
+.board-wrapper.drag-over{border-top:3px solid var(--accent);margin-top:-3px;}
+.board-drag-handle{display:none;cursor:grab;font-size:16px;color:var(--text2);padding:4px 8px;user-select:none;}
+.edit-mode .board-drag-handle{display:inline-flex;}
+.board-actions{display:none;gap:4px;align-items:center;}
+.edit-mode .board-actions{display:flex;}
+.board-action-btn{width:28px;height:28px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:var(--tr);color:var(--text2);}
+.board-action-btn:hover{background:var(--accent-light);color:var(--accent);border-color:var(--accent);}
+.board-action-btn.danger:hover{background:#fee2e2;color:var(--danger);border-color:var(--danger);}
+.add-element-btn{display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;border:2px dashed var(--border);border-radius:10px;cursor:pointer;font-size:13px;color:var(--text2);transition:var(--tr);margin-top:10px;width:100%;background:none;}
+.add-element-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-light);}
+/* Element picker */
+.el-type-picker{display:none;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px;background:var(--card-bg);border:1px solid var(--border);border-radius:var(--radius);margin-top:8px;}
+.el-type-picker.show{display:grid;}
+.el-type-picker button{padding:10px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg);cursor:pointer;font-size:12px;text-align:center;transition:var(--tr);color:var(--text);}
+.el-type-picker button:hover{border-color:var(--accent);background:var(--accent-light);color:var(--accent);}
+/* Element styles */
+.board-element{position:relative;padding:10px;border-radius:8px;margin-bottom:8px;transition:var(--tr);}
+.board-element:hover{background:var(--bg);}
+.board-element.edit-mode{border:1px dashed var(--border);padding-right:80px;}
+.element-controls{position:absolute;right:6px;top:6px;display:none;gap:3px;z-index:10;}
+.edit-mode .element-controls{display:flex;}
+.element-controls button{width:24px;height:24px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:var(--tr);color:var(--text2);}
+.element-controls button:hover{background:var(--accent-light);color:var(--accent);border-color:var(--accent);}
+.element-controls .ec-del:hover{background:#fee2e2;color:var(--danger);border-color:var(--danger);}
+/* Element render styles */
+.el-text{font-size:14px;line-height:1.7;white-space:pre-wrap;color:var(--text);}
+.el-checklist-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:13px;}
+.el-checklist-item input[type="checkbox"]{width:18px;height:18px;accent-color:var(--accent);}
+.el-checklist-item.done label{text-decoration:line-through;color:var(--text2);}
+.el-checklist-item label{cursor:pointer;flex:1;}
+.el-countdown-card{text-align:center;padding:16px;background:linear-gradient(135deg,var(--accent-light),var(--card-bg));border-radius:12px;border:1px solid var(--border);}
+.el-countdown-num{font-size:36px;font-weight:700;color:var(--accent);}
+.el-countdown-label{font-size:13px;color:var(--text2);margin-top:4px;}
+.el-image img{max-width:100%;border-radius:10px;}
+.el-image .el-caption{font-size:12px;color:var(--text2);text-align:center;margin-top:6px;}
+.el-divider hr{border:none;border-top:2px solid var(--border);margin:8px 0;}
+.el-divider.dashed hr{border-top-style:dashed;}
+.el-divider.dotted hr{border-top-style:dotted;}
+.el-table{width:100%;border-collapse:collapse;font-size:13px;}
+.el-table th,.el-table td{padding:8px 12px;border:1px solid var(--border);text-align:left;}
+.el-table th{background:var(--accent-light);color:var(--accent);font-weight:600;}
+.el-table td{background:var(--card-bg);}
+.el-quote{border-left:4px solid var(--accent);padding:12px 16px;background:var(--accent-light);border-radius:0 10px 10px 0;font-size:14px;line-height:1.7;font-style:italic;color:var(--text);}
+.el-quote .el-quote-author{font-size:12px;color:var(--text2);margin-top:6px;font-style:normal;}
+.el-linkcard{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--card-bg);border:1px solid var(--border);border-radius:10px;cursor:pointer;text-decoration:none;color:var(--text);transition:var(--tr);}
+.el-linkcard:hover{border-color:var(--accent);box-shadow:var(--shadow);}
+.el-linkcard .el-lc-icon{font-size:24px;flex-shrink:0;}
+.el-linkcard .el-lc-title{font-size:14px;font-weight:600;}
+.el-linkcard .el-lc-desc{font-size:12px;color:var(--text2);}
+.el-progress-wrap{padding:8px 0;}
+.el-progress-label{font-size:13px;margin-bottom:6px;display:flex;justify-content:space-between;}
+.el-progress-bar{height:10px;background:var(--border);border-radius:5px;overflow:hidden;}
+.el-progress-fill{height:100%;background:var(--accent);border-radius:5px;transition:width .3s;}
+.el-iframe iframe{width:100%;border:1px solid var(--border);border-radius:10px;}
+.el-codeblock{background:#1e1e2e;color:#cdd6f4;padding:16px;border-radius:10px;font-family:'Cascadia Code',Consolas,monospace;font-size:13px;line-height:1.6;overflow-x:auto;white-space:pre-wrap;word-break:break-all;}
+.el-markdown{font-size:14px;line-height:1.7;color:var(--text);}
+.el-markdown h1,.el-markdown h2,.el-markdown h3{margin:12px 0 8px;font-weight:600;}
+.el-markdown h1{font-size:20px;} .el-markdown h2{font-size:17px;} .el-markdown h3{font-size:15px;}
+.el-markdown code{background:var(--bg);padding:2px 6px;border-radius:4px;font-size:12px;font-family:monospace;}
+.el-markdown pre{background:#1e1e2e;color:#cdd6f4;padding:12px;border-radius:8px;overflow-x:auto;margin:8px 0;}
+.el-markdown pre code{background:none;padding:0;color:inherit;}
+.el-markdown blockquote{border-left:3px solid var(--accent);padding-left:12px;color:var(--text2);margin:8px 0;}
+.el-markdown ul,.el-markdown ol{padding-left:20px;margin:8px 0;}
+.el-markdown a{color:var(--accent);text-decoration:underline;}
+.el-markdown hr{border:none;border-top:1px solid var(--border);margin:12px 0;}
+@media(max-width:700px){.el-type-picker{grid-template-columns:repeat(3,1fr);}}
 </style>
 </head>
 <body>
@@ -350,47 +428,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
 <div class="page active" id="page-home">
   <div class="page-title">
     <span class="pt-icon">🏠</span> 主页
-    <!-- Exam bar in top-right -->
     <div class="exam-bar" id="exam-bar"></div>
+    <button class="board-action-btn" onclick="toggleEditMode()" title="编辑布局" style="margin-left:8px;">✏️</button>
   </div>
-  <div class="home-grid">
-    <!-- Todo Section -->
-    <div class="home-card" style="grid-column:1/-1;">
-      <div class="hc-title">
-        ✅ 待办事项
-        <span class="hc-collapse-btn" onclick="toggleCollapse('todos')">▾</span>
-      </div>
-      <div class="hc-body" id="todos-body">
-        <div class="todo-cats" id="todo-cats"></div>
-      </div>
-    </div>
-    <!-- Daily Expression -->
-    <div class="home-card">
-      <div class="hc-title">
-        📝 每日积累
-        <span class="hc-collapse-btn" onclick="toggleCollapse('expr')">▾</span>
-      </div>
-      <div class="hc-body" id="expr-body">
-        <div id="expr-area"></div>
-        <div class="expr-nav">
-          <button class="active" onclick="switchExpr('english',this)">英语表达</button>
-          <button onclick="switchExpr('politics',this)">政治背诵</button>
-          <button onclick="switchExpr('custom',this)">自定义</button>
-        </div>
-      </div>
-    </div>
+  <div class="edit-toolbar" id="edit-toolbar">
+    <span class="et-title">📐 编辑布局模式</span>
+    <button class="et-add" onclick="addCustomBoard()">+ 添加板块</button>
+    <button class="et-done" onclick="toggleEditMode()">✅ 完成编辑</button>
   </div>
-  <!-- 4-Day Timeline -->
-  <div class="timeline-section">
-    <div class="timeline-header">
-      <h3>📋 四天循环计划</h3>
-      <div class="timeline-nav" id="cycle-nav"></div>
-      <span class="hc-collapse-btn" onclick="toggleCollapse('timeline')" style="margin-left:auto;">▾</span>
-    </div>
-    <div class="hc-body" id="timeline-body">
-      <div class="timeline-grid" id="timeline-grid"></div>
-    </div>
-  </div>
+  <div id="home-boards"></div>
 </div>
 
 <!-- Category pages (rendered by JS) -->
@@ -550,6 +596,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
     </div>
     <div class="modal-btns" style="margin-top:12px;">
       <button class="btn-cancel" onclick="closeSyncModal()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<!-- Board Settings Modal -->
+<div class="overlay" id="board-settings-modal">
+  <div class="modal">
+    <h3 id="board-settings-title">板块设置</h3>
+    <input type="hidden" id="f-board-id" value="">
+    <label>板块名称</label>
+    <input type="text" id="f-board-name" placeholder="板块名称">
+    <label>宽度</label>
+    <select id="f-board-width">
+      <option value="full">全宽</option>
+      <option value="half">半宽</option>
+    </select>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeBoardSettings()">取消</button>
+      <button class="btn-save" onclick="saveBoardSettings()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Element Editor Modal -->
+<div class="overlay" id="element-modal">
+  <div class="modal" style="max-width:520px;">
+    <h3 id="element-modal-title">编辑元素</h3>
+    <input type="hidden" id="f-el-board-id" value="">
+    <input type="hidden" id="f-el-id" value="">
+    <input type="hidden" id="f-el-type" value="">
+    <div id="el-form-fields"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeElementModal()">取消</button>
+      <button class="btn-save" onclick="saveElement()">保存</button>
     </div>
   </div>
 </div>
@@ -1914,7 +1994,7 @@ updateClock();setInterval(updateClock,10000);
 
 // ====== Export/Import ======
 function exportData(){
-  const all={cats,catOrder,exams,notes,customExprs,feishuKBs,todos,timelineRounds,resSubjects,resLinks:resLinks.filter(r=>r.type==='link'),collapsed};
+  const all={cats,catOrder,exams,notes,customExprs,feishuKBs,todos,timelineRounds,resSubjects,resLinks:resLinks.filter(r=>r.type==='link'),collapsed,homeBoardOrder,customBoards,systemBoards};
   const blob=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='dashboard-backup.json';a.click();toast('数据已导出');
 }
@@ -1935,11 +2015,21 @@ function importData(e){
       if(all.resSubjects)resSubjects=all.resSubjects;
       if(all.resLinks){const localFiles=resLinks.filter(r=>r.type==='file');resLinks=[...all.resLinks,...localFiles];}
       if(all.collapsed)collapsed=all.collapsed;
+      if(all.homeBoardOrder)homeBoardOrder=all.homeBoardOrder;
+      if(all.customBoards)customBoards=all.customBoards;
+      if(all.systemBoards)systemBoards=all.systemBoards;
       saveStore('myNavCats',cats);saveStore('myNavCatOrder',catOrder);saveStore('myNavExams',exams);
       saveStore('myNavNotes',notes);saveStore('myNavCustomExprs',customExprs);saveStore('myNavFeishuKBs',feishuKBs);
       saveStore('myNavTodos',todos);saveStore('myNavTimelineRounds',timelineRounds);
       saveStore('myNavResSubjects',resSubjects);saveStore('myNavResLinks',resLinks);saveStore('myNavCollapsed',collapsed);
-      renderNav();renderExams();renderTodos();ensureCurrentRound();renderTimeline();renderNotes();renderFeishuKBs();applyCollapse();
+      saveStore('myNavHomeBoardOrder',homeBoardOrder);saveStore('myNavCustomBoards',customBoards);saveStore('myNavSystemBoards',systemBoards);
+      migrateBoardSystem();
+      renderNav();renderExams();renderHomeBoards();renderNotes();renderFeishuKBs();
+      setTimeout(() => {
+        if (homeBoardOrder.includes('board_todo')) renderTodos();
+        if (homeBoardOrder.includes('board_expr')) renderExpr();
+        if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
+      }, 50);
       switchPage('home');toast('导入成功！');
     }catch(err){alert('文件格式错误');}
   };
@@ -1956,7 +2046,7 @@ document.getElementById('daily-note').addEventListener('input',function(){docume
 // ====== Keyboard ======
 document.addEventListener('keydown',(e)=>{
   const inInput=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
-  if(e.key==='Escape'){closeLinkModal();closeCatModal();closeFeishuModal();closeSyncModal();closeResLinkModal();closeResPreview();var cm=document.getElementById('carryover-modal');if(cm)cm.classList.remove('show');if(inInput)document.activeElement.blur();return;}
+  if(e.key==='Escape'){closeLinkModal();closeCatModal();closeFeishuModal();closeSyncModal();closeResLinkModal();closeResPreview();closeBoardSettings();closeElementModal();if(editMode)toggleEditMode();var cm=document.getElementById('carryover-modal');if(cm)cm.classList.remove('show');if(inInput)document.activeElement.blur();return;}
   if(inInput)return;
   if(e.key.toLowerCase()==='t')toggleTheme();
 });
@@ -1994,7 +2084,7 @@ function saveSyncToken(){
 }
 
 function getSyncData(){
-  return {cats,catOrder,exams,notes,customExprs,feishuKBs,todos,timelineRounds,resSubjects,resLinks:resLinks.filter(r=>r.type==='link'),collapsed,syncTime:Date.now()};
+  return {cats,catOrder,exams,notes,customExprs,feishuKBs,todos,timelineRounds,resSubjects,resLinks:resLinks.filter(r=>r.type==='link'),collapsed,homeBoardOrder,customBoards,systemBoards,syncTime:Date.now()};
 }
 
 function applySyncData(data){
@@ -2015,7 +2105,16 @@ function applySyncData(data){
     saveStore('myNavResLinks',resLinks);
   }
   if(data.collapsed){collapsed=data.collapsed;saveStore('myNavCollapsed',collapsed);}
-  renderNav();renderExams();renderExpr();renderTodos();ensureCurrentRound();renderTimeline();renderNotes();renderFeishuKBs();applyCollapse();
+  if(data.homeBoardOrder){homeBoardOrder=data.homeBoardOrder;saveStore('myNavHomeBoardOrder',homeBoardOrder);}
+  if(data.customBoards){customBoards=data.customBoards;saveStore('myNavCustomBoards',customBoards);}
+  if(data.systemBoards){systemBoards=data.systemBoards;saveStore('myNavSystemBoards',systemBoards);}
+  migrateBoardSystem();
+  renderNav();renderExams();renderHomeBoards();renderNotes();renderFeishuKBs();
+  setTimeout(() => {
+    if (homeBoardOrder.includes('board_todo')) renderTodos();
+    if (homeBoardOrder.includes('board_expr')) renderExpr();
+    if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
+  }, 50);
 }
 
 async function syncUp(){
@@ -2113,8 +2212,645 @@ async function autoSync(){
   }catch(e){}
 }
 
+// ====== Board System (Visual Editor) ======
+const SYSTEM_BOARD_IDS = ['board_todo', 'board_expr', 'board_timeline'];
+const SYSTEM_BOARD_DEFAULTS = {
+  board_todo: { title: '✅ 待办事项', icon: '✅', collapsed: false, width: 'full' },
+  board_expr: { title: '📝 每日积累', icon: '📝', collapsed: false, width: 'half' },
+  board_timeline: { title: '📋 四天循环计划', icon: '📋', collapsed: false, width: 'full' }
+};
+const ELEMENT_TYPES = [
+  { type: 'text', name: '文本块', icon: '📝' },
+  { type: 'checklist', name: '待办清单', icon: '☑️' },
+  { type: 'countdown', name: '倒计时', icon: '⏳' },
+  { type: 'image', name: '图片', icon: '🖼️' },
+  { type: 'divider', name: '分隔线', icon: '➖' },
+  { type: 'table', name: '表格', icon: '📊' },
+  { type: 'quote', name: '名言', icon: '💬' },
+  { type: 'linkcard', name: '链接卡片', icon: '🔗' },
+  { type: 'progress', name: '进度条', icon: '📈' },
+  { type: 'iframe', name: '嵌入网页', icon: '🌐' },
+  { type: 'codeblock', name: '代码块', icon: '💻' },
+  { type: 'markdown', name: 'Markdown', icon: '📄' }
+];
+
+let editMode = false;
+let homeBoardOrder = loadStore('myNavHomeBoardOrder', null);
+let customBoards = loadStore('myNavCustomBoards', []);
+let systemBoards = loadStore('myNavSystemBoards', null);
+
+// Migration from legacy
+function migrateBoardSystem() {
+  if (!homeBoardOrder) {
+    homeBoardOrder = ['board_todo', 'board_expr', 'board_timeline'];
+    saveStore('myNavHomeBoardOrder', homeBoardOrder);
+  }
+  if (!systemBoards) {
+    systemBoards = {};
+    const oldCollapsed = loadStore('myNavCollapsed', []);
+    SYSTEM_BOARD_IDS.forEach(id => {
+      const def = SYSTEM_BOARD_DEFAULTS[id];
+      const legacyKey = id === 'board_todo' ? 'todos' : id === 'board_expr' ? 'expr' : 'timeline';
+      systemBoards[id] = { title: def.title, icon: def.icon, collapsed: oldCollapsed.includes(legacyKey), width: def.width };
+    });
+    saveStore('myNavSystemBoards', systemBoards);
+  }
+  // Ensure all system boards exist in order
+  SYSTEM_BOARD_IDS.forEach(id => {
+    if (!homeBoardOrder.includes(id)) homeBoardOrder.push(id);
+  });
+  // Clean up removed board IDs from order
+  homeBoardOrder = homeBoardOrder.filter(id => SYSTEM_BOARD_IDS.includes(id) || customBoards.some(b => b.id === id));
+  saveStore('myNavHomeBoardOrder', homeBoardOrder);
+}
+
+function getAllBoards() {
+  return homeBoardOrder.map(id => {
+    if (SYSTEM_BOARD_IDS.includes(id)) {
+      const cfg = systemBoards[id] || SYSTEM_BOARD_DEFAULTS[id];
+      return { id, type: 'system', title: cfg.title, icon: cfg.icon, collapsed: cfg.collapsed, width: cfg.width };
+    }
+    return customBoards.find(b => b.id === id);
+  }).filter(Boolean);
+}
+
+function getBoardById(id) {
+  return getAllBoards().find(b => b.id === id) || null;
+}
+
+function saveBoardOrder() { saveStore('myNavHomeBoardOrder', homeBoardOrder); }
+function saveCustomBoards() { saveStore('myNavCustomBoards', customBoards); }
+function saveSystemBoards() { saveStore('myNavSystemBoards', systemBoards); }
+
+// ====== Edit Mode ======
+function toggleEditMode() {
+  editMode = !editMode;
+  document.body.classList.toggle('edit-mode-active', editMode);
+  document.getElementById('edit-toolbar').classList.toggle('show', editMode);
+  renderHomeBoards();
+  if (!editMode) toast('布局已保存');
+}
+
+// ====== Render Home Boards ======
+function renderHomeBoards() {
+  const container = document.getElementById('home-boards');
+  if (!container) return;
+  container.innerHTML = '';
+  const boards = getAllBoards();
+
+  // Separate into grid items and full-width items
+  let gridOpen = false;
+  boards.forEach((board, idx) => {
+    if (board.width === 'half') {
+      if (!gridOpen) {
+        const grid = document.createElement('div');
+        grid.className = 'home-grid';
+        grid.id = 'home-grid-' + idx;
+        container.appendChild(grid);
+        gridOpen = true;
+      }
+      gridOpen && container.lastChild.appendChild(renderBoard(board));
+    } else {
+      if (gridOpen) gridOpen = false;
+      container.appendChild(renderBoard(board));
+    }
+  });
+}
+
+function renderBoard(board) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'board-wrapper' + (editMode ? ' edit-mode' : '');
+  wrapper.dataset.boardId = board.id;
+  if (board.width === 'full' && board.id === 'board_todo') wrapper.style.gridColumn = '1/-1';
+  if (board.width === 'full' && board.id !== 'board_todo') wrapper.style.marginBottom = '18px';
+
+  // Drag handle + header
+  const isCollapsed = board.collapsed;
+  const isSystem = board.type === 'system';
+
+  let headerHtml = `<div class="hc-title" style="cursor:pointer;">
+    <span class="board-drag-handle" title="拖拽排序">⠿</span>
+    ${esc(board.title || board.icon || '板块')}
+    <span class="hc-collapse-btn" onclick="event.stopPropagation();toggleBoardCollapse('${board.id}')">${isCollapsed ? '▸' : '▾'}</span>
+    <div class="board-actions">
+      <button class="board-action-btn" onclick="event.stopPropagation();openBoardSettings('${board.id}')" title="设置">⚙️</button>
+      ${!isSystem ? `<button class="board-action-btn danger" onclick="event.stopPropagation();deleteBoard('${board.id}')" title="删除">✕</button>` : ''}
+    </div>
+  </div>`;
+
+  wrapper.innerHTML = headerHtml;
+
+  // Body
+  const body = document.createElement('div');
+  body.className = 'hc-body' + (isCollapsed ? ' collapsed' : '');
+
+  if (board.id === 'board_todo') {
+    const inner = document.createElement('div');
+    inner.className = 'todo-cats';
+    inner.id = 'todo-cats';
+    body.appendChild(inner);
+  } else if (board.id === 'board_expr') {
+    const inner = document.createElement('div');
+    inner.id = 'expr-body-inner';
+    inner.innerHTML = '<div id="expr-area"></div><div class="expr-nav"><button class="active" onclick="switchExpr(\'english\',this)">英语表达</button><button onclick="switchExpr(\'politics\',this)">政治背诵</button><button onclick="switchExpr(\'custom\',this)">自定义</button></div>';
+    body.appendChild(inner);
+  } else if (board.id === 'board_timeline') {
+    const inner = document.createElement('div');
+    inner.id = 'timeline-inner';
+    inner.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;"><h3 style="font-size:16px;font-weight:600;">📋 四天循环计划</h3><div class="timeline-nav" id="cycle-nav"></div></div><div class="timeline-grid" id="timeline-grid"></div>';
+    body.appendChild(inner);
+  } else if (board.type === 'custom') {
+    renderCustomBoardBody(body, board);
+  }
+
+  wrapper.appendChild(body);
+
+  // Drag events for edit mode
+  if (editMode) {
+    wrapper.draggable = true;
+    wrapper.addEventListener('dragstart', onBoardDragStart);
+    wrapper.addEventListener('dragend', onBoardDragEnd);
+    wrapper.addEventListener('dragover', onBoardDragOver);
+    wrapper.addEventListener('dragleave', onBoardDragLeave);
+    wrapper.addEventListener('drop', onBoardDrop);
+  }
+
+  return wrapper;
+}
+
+function renderCustomBoardBody(container, board) {
+  const elements = board.elements || [];
+  elements.forEach((el, idx) => {
+    const elDiv = document.createElement('div');
+    elDiv.className = 'board-element' + (editMode ? ' edit-mode' : '');
+    elDiv.dataset.elId = el.id;
+    elDiv.dataset.boardId = board.id;
+
+    if (editMode) {
+      elDiv.innerHTML = `<div class="element-controls">
+        <button onclick="moveElement('${board.id}','${el.id}',-1)" title="上移">↑</button>
+        <button onclick="moveElement('${board.id}','${el.id}',1)" title="下移">↓</button>
+        <button onclick="openElementEditor('${board.id}','${el.id}')" title="编辑">✏️</button>
+        <button class="ec-del" onclick="deleteElement('${board.id}','${el.id}')" title="删除">✕</button>
+      </div>`;
+    }
+
+    const content = renderElement(el);
+    elDiv.appendChild(content);
+    container.appendChild(elDiv);
+  });
+
+  if (editMode) {
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-element-btn';
+    addBtn.innerHTML = '+ 添加元素';
+    addBtn.onclick = () => openAddElementPicker(board.id);
+    container.appendChild(addBtn);
+
+    const picker = document.createElement('div');
+    picker.className = 'el-type-picker';
+    picker.id = 'el-picker-' + board.id;
+    ELEMENT_TYPES.forEach(et => {
+      const btn = document.createElement('button');
+      btn.innerHTML = et.icon + ' ' + et.name;
+      btn.onclick = () => { picker.classList.remove('show'); addNewElement(board.id, et.type); };
+      picker.appendChild(btn);
+    });
+    container.appendChild(picker);
+  }
+}
+
+// ====== Element Renderers ======
+function renderElement(el) {
+  const d = document.createElement('div');
+  switch (el.type) {
+    case 'text': d.className = 'el-text'; d.textContent = el.data.content || ''; break;
+    case 'checklist': {
+      (el.data.items || []).forEach((item, i) => {
+        const row = document.createElement('div');
+        row.className = 'el-checklist-item' + (item.checked ? ' done' : '');
+        row.innerHTML = `<input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleChecklistItem('${el.id}',${i})"><label>${esc(item.text)}</label>`;
+        d.appendChild(row);
+      });
+      break;
+    }
+    case 'countdown': {
+      d.className = 'el-countdown-card';
+      const target = new Date(el.data.targetDate);
+      const now = new Date(); now.setHours(0,0,0,0); target.setHours(0,0,0,0);
+      const diff = Math.ceil((target - now) / 86400000);
+      const label = diff > 0 ? diff + ' 天' : diff === 0 ? '今天' : '已过 ' + Math.abs(diff) + ' 天';
+      d.innerHTML = `<div class="el-countdown-num">${diff > 0 ? diff : 0}</div><div class="el-countdown-label">${esc(el.data.label || '')} · ${label}</div>`;
+      break;
+    }
+    case 'image': {
+      d.className = 'el-image';
+      if (el.data.src) {
+        d.innerHTML = `<img src="${esc(el.data.src)}" alt="${esc(el.data.alt || '')}">${el.data.caption ? '<div class="el-caption">' + esc(el.data.caption) + '</div>' : ''}`;
+      } else {
+        d.innerHTML = '<p style="color:var(--text2);text-align:center;">暂无图片</p>';
+      }
+      break;
+    }
+    case 'divider':
+      d.className = 'el-divider ' + (el.data.style || 'solid');
+      d.innerHTML = '<hr>';
+      break;
+    case 'table': {
+      const headers = el.data.headers || [];
+      const rows = el.data.rows || [];
+      let html = '<table class="el-table"><thead><tr>' + headers.map(h => '<th>' + esc(h) + '</th>').join('') + '</tr></thead><tbody>';
+      rows.forEach(row => { html += '<tr>' + row.map(c => '<td>' + esc(c) + '</td>').join('') + '</tr>'; });
+      html += '</tbody></table>';
+      d.innerHTML = html;
+      break;
+    }
+    case 'quote':
+      d.className = 'el-quote';
+      d.innerHTML = esc(el.data.text || '') + (el.data.author ? '<div class="el-quote-author">— ' + esc(el.data.author) + '</div>' : '');
+      break;
+    case 'linkcard': {
+      const icon = el.data.icon || '🔗';
+      d.innerHTML = `<a class="el-linkcard" href="${esc(el.data.url || '#')}" target="_blank">
+        <span class="el-lc-icon">${icon}</span>
+        <div><div class="el-lc-title">${esc(el.data.title || '')}</div>
+        ${el.data.desc ? '<div class="el-lc-desc">' + esc(el.data.desc) + '</div>' : ''}</div></a>`;
+      break;
+    }
+    case 'progress': {
+      const val = Math.min(Math.max(el.data.value || 0, 0), el.data.max || 100);
+      const pct = Math.round(val / (el.data.max || 100) * 100);
+      d.className = 'el-progress-wrap';
+      d.innerHTML = `<div class="el-progress-label"><span>${esc(el.data.label || '')}</span><span>${pct}%</span></div>
+        <div class="el-progress-bar"><div class="el-progress-fill" style="width:${pct}%;background:${el.data.color || 'var(--accent)'}"></div></div>`;
+      break;
+    }
+    case 'iframe':
+      d.className = 'el-iframe';
+      d.innerHTML = `<iframe src="${esc(el.data.url || '')}" style="height:${el.data.height || 400}px" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>`;
+      break;
+    case 'codeblock':
+      d.innerHTML = `<pre class="el-codeblock"><code>${esc(el.data.code || '')}</code></pre>`;
+      break;
+    case 'markdown':
+      d.className = 'el-markdown';
+      d.innerHTML = parseMarkdown(el.data.content || '');
+      break;
+    default:
+      d.innerHTML = '<p style="color:var(--text2);">未知元素类型</p>';
+  }
+  return d;
+}
+
+// ====== Simple Markdown Parser ======
+function parseMarkdown(md) {
+  let html = md
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code>$1</code>')
+    .replace(/^\> (.+)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/^---$/gm, '<hr>')
+    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank">$1</a>')
+    .replace(/\n/g, '<br>');
+  // Wrap consecutive <li> in <ul>
+  html = html.replace(/((?:<li>.*?<\/li><br>?)+)/g, (m) => '<ul>' + m.replace(/<br>/g, '') + '</ul>');
+  return html;
+}
+
+// ====== Board CRUD ======
+function addCustomBoard() {
+  const title = prompt('输入新板块名称：');
+  if (!title || !title.trim()) return;
+  const id = 'board_custom_' + uid();
+  customBoards.push({ id, type: 'custom', title: title.trim(), icon: '📌', collapsed: false, width: 'full', elements: [] });
+  homeBoardOrder.push(id);
+  saveCustomBoards(); saveBoardOrder();
+  renderHomeBoards();
+  toast('板块已添加');
+}
+
+function deleteBoard(boardId) {
+  if (SYSTEM_BOARD_IDS.includes(boardId)) return;
+  const board = customBoards.find(b => b.id === boardId);
+  if (!board) return;
+  if (!confirm('删除板块「' + board.title + '」及其所有元素？')) return;
+  customBoards = customBoards.filter(b => b.id !== boardId);
+  homeBoardOrder = homeBoardOrder.filter(id => id !== boardId);
+  saveCustomBoards(); saveBoardOrder();
+  renderHomeBoards();
+  toast('板块已删除');
+}
+
+function renameBoard(boardId) {
+  const board = getBoardById(boardId);
+  if (!board) return;
+  const name = prompt('输入新名称：', board.title);
+  if (!name || !name.trim()) return;
+  if (SYSTEM_BOARD_IDS.includes(boardId)) {
+    systemBoards[boardId].title = name.trim();
+    saveSystemBoards();
+  } else {
+    board.title = name.trim();
+    saveCustomBoards();
+  }
+  renderHomeBoards();
+}
+
+function toggleBoardCollapse(boardId) {
+  if (SYSTEM_BOARD_IDS.includes(boardId)) {
+    systemBoards[boardId].collapsed = !systemBoards[boardId].collapsed;
+    saveSystemBoards();
+  } else {
+    const board = customBoards.find(b => b.id === boardId);
+    if (board) { board.collapsed = !board.collapsed; saveCustomBoards(); }
+  }
+  // Toggle CSS
+  const wrapper = document.querySelector(`[data-board-id="${boardId}"]`);
+  if (wrapper) {
+    const body = wrapper.querySelector('.hc-body');
+    const btn = wrapper.querySelector('.hc-collapse-btn');
+    if (body) body.classList.toggle('collapsed');
+    if (btn) btn.textContent = body && body.classList.contains('collapsed') ? '▸' : '▾';
+  }
+}
+
+function openBoardSettings(boardId) {
+  const board = getBoardById(boardId);
+  if (!board) return;
+  document.getElementById('f-board-id').value = boardId;
+  document.getElementById('f-board-name').value = board.title;
+  document.getElementById('f-board-width').value = board.width || 'full';
+  document.getElementById('board-settings-title').textContent = '板块设置 - ' + board.title;
+  document.getElementById('board-settings-modal').classList.add('show');
+}
+
+function closeBoardSettings() { document.getElementById('board-settings-modal').classList.remove('show'); }
+
+function saveBoardSettings() {
+  const boardId = document.getElementById('f-board-id').value;
+  const name = document.getElementById('f-board-name').value.trim();
+  const width = document.getElementById('f-board-width').value;
+  if (!name) return toast('名称不能为空');
+  if (SYSTEM_BOARD_IDS.includes(boardId)) {
+    systemBoards[boardId].title = name;
+    systemBoards[boardId].width = width;
+    saveSystemBoards();
+  } else {
+    const board = customBoards.find(b => b.id === boardId);
+    if (board) { board.title = name; board.width = width; saveCustomBoards(); }
+  }
+  closeBoardSettings();
+  renderHomeBoards();
+  toast('设置已保存');
+}
+
+// ====== Element CRUD ======
+function openAddElementPicker(boardId) {
+  const picker = document.getElementById('el-picker-' + boardId);
+  if (picker) picker.classList.toggle('show');
+}
+
+function getDefaultElementData(type) {
+  const today = new Date();
+  const nextWeek = new Date(today.getTime() + 7 * 86400000).toISOString().slice(0, 10);
+  switch (type) {
+    case 'text': return { content: '' };
+    case 'checklist': return { items: [{ id: uid(), text: '新任务', checked: false }] };
+    case 'countdown': return { label: '倒计时', targetDate: nextWeek };
+    case 'image': return { src: '', alt: '', caption: '' };
+    case 'divider': return { style: 'solid' };
+    case 'table': return { headers: ['列1', '列2'], rows: [['', '']] };
+    case 'quote': return { text: '', author: '' };
+    case 'linkcard': return { title: '', url: '', desc: '', icon: '🔗' };
+    case 'progress': return { label: '进度', value: 0, max: 100, color: '' };
+    case 'iframe': return { url: '', height: 400 };
+    case 'codeblock': return { code: '' };
+    case 'markdown': return { content: '' };
+    default: return {};
+  }
+}
+
+function addNewElement(boardId, type) {
+  const board = customBoards.find(b => b.id === boardId);
+  if (!board) return;
+  const el = { id: uid(), type, data: getDefaultElementData(type) };
+  board.elements.push(el);
+  saveCustomBoards();
+  openElementEditor(boardId, el.id);
+}
+
+function openElementEditor(boardId, elId) {
+  const board = customBoards.find(b => b.id === boardId);
+  if (!board) return;
+  const el = board.elements.find(e => e.id === elId);
+  if (!el) return;
+  document.getElementById('f-el-board-id').value = boardId;
+  document.getElementById('f-el-id').value = elId;
+  document.getElementById('f-el-type').value = el.type;
+  const etInfo = ELEMENT_TYPES.find(t => t.type === el.type);
+  document.getElementById('element-modal-title').textContent = '编辑 ' + (etInfo ? etInfo.name : '元素');
+
+  const fields = document.getElementById('el-form-fields');
+  fields.innerHTML = buildElementForm(el);
+  document.getElementById('element-modal').classList.add('show');
+}
+
+function buildElementForm(el) {
+  const d = el.data;
+  switch (el.type) {
+    case 'text':
+      return `<label>内容</label><textarea id="ef-content" rows="5" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);resize:vertical;font-family:inherit;">${esc(d.content || '')}</textarea>`;
+    case 'checklist':
+      return `<label>清单项目（每行一个，✅开头表示已完成）</label><textarea id="ef-items" rows="6" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);resize:vertical;font-family:inherit;">${(d.items || []).map(i => (i.checked ? '✅ ' : '') + i.text).join('\n')}</textarea>`;
+    case 'countdown':
+      return `<label>标签</label><input type="text" id="ef-label" value="${esc(d.label || '')}" placeholder="例如：期末考试">
+        <label>目标日期</label><input type="date" id="ef-date" value="${d.targetDate || ''}">`;
+    case 'image':
+      return `<label>图片地址（URL 或 base64）</label><input type="text" id="ef-src" value="${esc(d.src || '')}" placeholder="https://...">
+        <label>替代文字</label><input type="text" id="ef-alt" value="${esc(d.alt || '')}" placeholder="图片描述">
+        <label>说明文字</label><input type="text" id="ef-caption" value="${esc(d.caption || '')}" placeholder="图片下方说明">
+        <label>或上传本地图片</label><input type="file" id="ef-file" accept="image/*" onchange="handleElImageUpload(this)">`;
+    case 'divider':
+      return `<label>样式</label><select id="ef-style"><option value="solid" ${d.style === 'solid' ? 'selected' : ''}>实线</option><option value="dashed" ${d.style === 'dashed' ? 'selected' : ''}>虚线</option><option value="dotted" ${d.style === 'dotted' ? 'selected' : ''}>点线</option></select>`;
+    case 'table':
+      return `<label>表头（逗号分隔）</label><input type="text" id="ef-headers" value="${esc((d.headers || []).join(','))}" placeholder="列1,列2,列3">
+        <label>数据行（每行逗号分隔）</label><textarea id="ef-rows" rows="5" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);resize:vertical;font-family:inherit;">${(d.rows || []).map(r => r.join(',')).join('\n')}</textarea>`;
+    case 'quote':
+      return `<label>名言内容</label><textarea id="ef-text" rows="3" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);resize:vertical;font-family:inherit;">${esc(d.text || '')}</textarea>
+        <label>作者</label><input type="text" id="ef-author" value="${esc(d.author || '')}" placeholder="作者名">`;
+    case 'linkcard':
+      return `<label>标题</label><input type="text" id="ef-title" value="${esc(d.title || '')}" placeholder="链接标题">
+        <label>网址</label><input type="url" id="ef-url" value="${esc(d.url || '')}" placeholder="https://...">
+        <label>描述</label><input type="text" id="ef-desc" value="${esc(d.desc || '')}" placeholder="简短描述">
+        <label>图标（emoji）</label><input type="text" id="ef-icon" value="${esc(d.icon || '🔗')}" placeholder="🔗" style="width:60px;">`;
+    case 'progress':
+      return `<label>标签</label><input type="text" id="ef-label" value="${esc(d.label || '')}" placeholder="进度名称">
+        <label>当前值</label><input type="number" id="ef-value" value="${d.value || 0}" min="0">
+        <label>最大值</label><input type="number" id="ef-max" value="${d.max || 100}" min="1">
+        <label>颜色</label><input type="color" id="ef-color" value="${d.color || '#4361ee'}">`;
+    case 'iframe':
+      return `<label>网页地址</label><input type="url" id="ef-url" value="${esc(d.url || '')}" placeholder="https://...">
+        <label>高度（px）</label><input type="number" id="ef-height" value="${d.height || 400}" min="100" max="2000">`;
+    case 'codeblock':
+      return `<label>代码</label><textarea id="ef-code" rows="8" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:var(--bg);color:var(--text);resize:vertical;font-family:monospace;">${esc(d.code || '')}</textarea>`;
+    case 'markdown':
+      return `<label>Markdown 内容</label><textarea id="ef-content" rows="8" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);resize:vertical;font-family:inherit;">${esc(d.content || '')}</textarea>
+        <p style="font-size:11px;color:var(--text2);margin-top:4px;">支持：# 标题、**粗体**、*斜体*、\`代码\`、[链接](url)、- 列表、> 引用</p>`;
+    default: return '<p>不支持的元素类型</p>';
+  }
+}
+
+function handleElImageUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('ef-src').value = e.target.result;
+    toast('图片已加载');
+  };
+  reader.readAsDataURL(file);
+}
+
+function closeElementModal() { document.getElementById('element-modal').classList.remove('show'); }
+
+function saveElement() {
+  const boardId = document.getElementById('f-el-board-id').value;
+  const elId = document.getElementById('f-el-id').value;
+  const type = document.getElementById('f-el-type').value;
+  const board = customBoards.find(b => b.id === boardId);
+  if (!board) return;
+  const el = board.elements.find(e => e.id === elId);
+  if (!el) return;
+
+  const gv = (id) => { const e = document.getElementById(id); return e ? e.value : ''; };
+
+  switch (type) {
+    case 'text': el.data = { content: gv('ef-content') }; break;
+    case 'checklist':
+      el.data = { items: gv('ef-items').split('\n').filter(l => l.trim()).map(line => {
+        const checked = line.trim().startsWith('✅');
+        return { id: uid(), text: line.replace(/^✅\s*/, '').trim(), checked };
+      })}; break;
+    case 'countdown': el.data = { label: gv('ef-label'), targetDate: gv('ef-date') }; break;
+    case 'image': el.data = { src: gv('ef-src'), alt: gv('ef-alt'), caption: gv('ef-caption') }; break;
+    case 'divider': el.data = { style: gv('ef-style') }; break;
+    case 'table':
+      el.data = {
+        headers: gv('ef-headers').split(',').map(s => s.trim()),
+        rows: gv('ef-rows').split('\n').filter(l => l.trim()).map(r => r.split(',').map(s => s.trim()))
+      }; break;
+    case 'quote': el.data = { text: gv('ef-text'), author: gv('ef-author') }; break;
+    case 'linkcard': el.data = { title: gv('ef-title'), url: gv('ef-url'), desc: gv('ef-desc'), icon: gv('ef-icon') || '🔗' }; break;
+    case 'progress': el.data = { label: gv('ef-label'), value: parseInt(gv('ef-value')) || 0, max: parseInt(gv('ef-max')) || 100, color: gv('ef-color') }; break;
+    case 'iframe': el.data = { url: gv('ef-url'), height: parseInt(gv('ef-height')) || 400 }; break;
+    case 'codeblock': el.data = { code: gv('ef-code') }; break;
+    case 'markdown': el.data = { content: gv('ef-content') }; break;
+  }
+
+  saveCustomBoards();
+  closeElementModal();
+  renderHomeBoards();
+  // Re-render system boards after custom boards
+  if (homeBoardOrder.includes('board_todo')) renderTodos();
+  if (homeBoardOrder.includes('board_expr')) renderExpr();
+  if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
+  toast('元素已保存');
+}
+
+function deleteElement(boardId, elId) {
+  const board = customBoards.find(b => b.id === boardId);
+  if (!board) return;
+  board.elements = board.elements.filter(e => e.id !== elId);
+  saveCustomBoards();
+  renderHomeBoards();
+  // Re-render system boards
+  if (homeBoardOrder.includes('board_todo')) renderTodos();
+  if (homeBoardOrder.includes('board_expr')) renderExpr();
+  if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
+}
+
+function moveElement(boardId, elId, dir) {
+  const board = customBoards.find(b => b.id === boardId);
+  if (!board) return;
+  const idx = board.elements.findIndex(e => e.id === elId);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= board.elements.length) return;
+  [board.elements[idx], board.elements[newIdx]] = [board.elements[newIdx], board.elements[idx]];
+  saveCustomBoards();
+  renderHomeBoards();
+  // Re-render system boards
+  if (homeBoardOrder.includes('board_todo')) renderTodos();
+  if (homeBoardOrder.includes('board_expr')) renderExpr();
+  if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
+}
+
+function toggleChecklistItem(elId, itemIdx) {
+  // Find element across all custom boards
+  for (const board of customBoards) {
+    const el = board.elements.find(e => e.id === elId);
+    if (el && el.type === 'checklist') {
+      el.data.items[itemIdx].checked = !el.data.items[itemIdx].checked;
+      saveCustomBoards();
+      renderHomeBoards();
+      if (homeBoardOrder.includes('board_todo')) renderTodos();
+      if (homeBoardOrder.includes('board_expr')) renderExpr();
+      if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
+      return;
+    }
+  }
+}
+
+// ====== Board Drag & Drop ======
+let boardDragId = null;
+function onBoardDragStart(e) {
+  boardDragId = this.dataset.boardId;
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+}
+function onBoardDragEnd() {
+  this.classList.remove('dragging');
+  document.querySelectorAll('.board-wrapper.drag-over').forEach(el => el.classList.remove('drag-over'));
+  boardDragId = null;
+}
+function onBoardDragOver(e) {
+  e.preventDefault();
+  if (this.dataset.boardId && this.dataset.boardId !== boardDragId) {
+    this.classList.add('drag-over');
+  }
+}
+function onBoardDragLeave() { this.classList.remove('drag-over'); }
+function onBoardDrop(e) {
+  e.preventDefault();
+  this.classList.remove('drag-over');
+  const targetId = this.dataset.boardId;
+  if (!boardDragId || !targetId || boardDragId === targetId) return;
+  const fromIdx = homeBoardOrder.indexOf(boardDragId);
+  const toIdx = homeBoardOrder.indexOf(targetId);
+  if (fromIdx < 0 || toIdx < 0) return;
+  homeBoardOrder.splice(fromIdx, 1);
+  homeBoardOrder.splice(toIdx, 0, boardDragId);
+  saveBoardOrder();
+  renderHomeBoards();
+  if (homeBoardOrder.includes('board_todo')) renderTodos();
+  if (homeBoardOrder.includes('board_expr')) renderExpr();
+  if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
+  toast('板块顺序已更新');
+}
+
 // ====== Init ======
-renderNav();renderExams();renderExpr();renderTodos();ensureCurrentRound();renderTimeline();renderNotes();renderFeishuKBs();applyCollapse();
+migrateBoardSystem();
+renderNav();renderExams();renderHomeBoards();renderNotes();renderFeishuKBs();
+// Render system board content after DOM is ready
+setTimeout(() => {
+  if (homeBoardOrder.includes('board_todo')) renderTodos();
+  if (homeBoardOrder.includes('board_expr')) renderExpr();
+  if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
+}, 50);
 autoSync().then(()=>{_autoUploadReady=true;});
 // Re-sync when page becomes visible (switching tabs, unlocking phone)
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)silentDownload();});
