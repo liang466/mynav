@@ -487,14 +487,41 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
   <div class="page-title">
     <span class="pt-icon">🏠</span> 主页
     <div class="exam-bar" id="exam-bar"></div>
-    <button class="board-action-btn" onclick="toggleEditMode()" title="编辑布局" style="margin-left:8px;">✏️</button>
   </div>
-  <div class="edit-toolbar" id="edit-toolbar">
-    <span class="et-title">📐 编辑布局模式</span>
-    <button class="et-add" onclick="addCustomBoard()">+ 添加板块</button>
-    <button class="et-done" onclick="toggleEditMode()">✅ 完成编辑</button>
+
+  <!-- Todo Section -->
+  <div class="home-card" style="margin-bottom:18px;">
+    <div class="hc-title">✅ 待办事项 <span class="hc-collapse-btn" onclick="toggleHomeCollapse('home-todo-body',this)">▾</span></div>
+    <div class="hc-body" id="home-todo-body">
+      <div class="todo-cats" id="todo-cats"></div>
+    </div>
   </div>
-  <div id="home-boards"></div>
+
+  <!-- Expressions Section (user-defined) -->
+  <div class="home-grid" style="margin-bottom:18px;">
+    <div class="home-card">
+      <div class="hc-title">📝 每日背诵 <span class="hc-collapse-btn" onclick="toggleHomeCollapse('home-expr-body',this)">▾</span></div>
+      <div class="hc-body" id="home-expr-body">
+        <div id="expr-area"></div>
+        <div id="expr-controls" style="margin-top:10px;"></div>
+      </div>
+    </div>
+    <div class="home-card">
+      <div class="hc-title">📊 今日统计</div>
+      <div id="home-stats" style="font-size:13px;color:var(--text2);line-height:2;"></div>
+    </div>
+  </div>
+
+  <!-- Timeline Section -->
+  <div class="home-card" style="margin-bottom:18px;">
+    <div class="hc-title">📋 四天循环计划 <span class="hc-collapse-btn" onclick="toggleHomeCollapse('home-timeline-body',this)">▾</span></div>
+    <div class="hc-body" id="home-timeline-body">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+        <div class="timeline-nav" id="cycle-nav"></div>
+      </div>
+      <div class="timeline-grid" id="timeline-grid"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Category pages (rendered by JS) -->
@@ -659,40 +686,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
   </div>
 </div>
 
-<!-- Board Settings Modal -->
-<div class="overlay" id="board-settings-modal">
-  <div class="modal">
-    <h3 id="board-settings-title">板块设置</h3>
-    <input type="hidden" id="f-board-id" value="">
-    <label>板块名称</label>
-    <input type="text" id="f-board-name" placeholder="板块名称">
-    <label>宽度</label>
-    <select id="f-board-width">
-      <option value="full">全宽</option>
-      <option value="half">半宽</option>
-    </select>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeBoardSettings()">取消</button>
-      <button class="btn-save" onclick="saveBoardSettings()">保存</button>
-    </div>
-  </div>
-</div>
-
-<!-- Element Editor Modal -->
-<div class="overlay" id="element-modal">
-  <div class="modal" style="max-width:520px;">
-    <h3 id="element-modal-title">编辑元素</h3>
-    <input type="hidden" id="f-el-board-id" value="">
-    <input type="hidden" id="f-el-id" value="">
-    <input type="hidden" id="f-el-type" value="">
-    <div id="el-form-fields"></div>
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeElementModal()">取消</button>
-      <button class="btn-save" onclick="saveElement()">保存</button>
-    </div>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
@@ -805,6 +798,7 @@ const DEFAULT_CATS=[
 // ====== Data ======
 function loadStore(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}}
 function saveStore(k,v){localStorage.setItem(k,JSON.stringify(v));localStorage.setItem('myNavLocalModified',Date.now().toString());scheduleAutoUpload();}
+function uid(){return 'x'+Math.random().toString(36).substr(2,9);}
 let _autoUploadReady=false;
 let _autoUploadTimer=null;
 function scheduleAutoUpload(){
@@ -1087,45 +1081,124 @@ function delExam(i){
   exams.splice(i,1);saveStore('myNavExams',exams);renderExams();
 }
 
-// ====== Expressions ======
-let currentExprType='english';
-function switchExpr(type,btn){
-  currentExprType=type;
-  document.querySelectorAll('.expr-nav button').forEach(b=>b.classList.remove('active'));
-  if(btn)btn.classList.add('active');
+// ====== Expressions (User-defined memorization cards) ======
+let exprCards = loadStore('myNavExprCards', []);
+// Migrate old customExprs if they exist
+if(exprCards.length===0 && customExprs.length>0){
+  customExprs.forEach(e=>exprCards.push({id:uid(),category:'custom',front:e.en||'',back:e.zh||'',tip:e.tip||''}));
+  saveStore('myNavExprCards', exprCards);
+}
+let exprCategory = 'english';
+let exprCardIdx = {english:0, politics:0, custom:0};
+let exprShowBack = false;
+
+function switchExpr(cat, btn){
+  exprCategory = cat;
+  exprShowBack = false;
+  document.querySelectorAll('#expr-controls .expr-nav button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
   renderExpr();
 }
+
 function renderExpr(){
-  const area=document.getElementById('expr-area');
-  let list=currentExprType==='english'?ENGLISH_EXPRS:currentExprType==='politics'?POLITICS_EXPRS:customExprs;
-  if(!list.length){area.innerHTML='<p style="color:var(--text2);font-size:13px;padding:16px 0;">暂无内容，可自定义添加</p>';return;}
-  const idx=exprIdx[currentExprType]%list.length;
-  const item=list[idx];
-  area.innerHTML=`<div class="expr-card">
-    <div class="expr-type">${currentExprType==='english'?'英语满分表达':currentExprType==='politics'?'政治背诵要点':'自定义'}</div>
-    <div class="expr-content">${esc(item.en)}</div>
-    <div class="expr-meaning">${esc(item.zh)}${item.tip?' · <b>'+esc(item.tip)+'</b>':''}</div>
-  </div>
-  <div style="display:flex;justify-content:space-between;align-items:center;">
-    <span style="font-size:11px;color:var(--text2);">${idx+1} / ${list.length}</span>
-    <div style="display:flex;gap:6px;">
-      <button class="expr-nav" style="padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);cursor:pointer;font-size:12px;color:var(--text2);" onclick="exprPrev()">上一条</button>
-      <button class="expr-nav" style="padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);cursor:pointer;font-size:12px;color:var(--text2);" onclick="exprNext()">下一条</button>
-    </div>
-  </div>`;
+  const area = document.getElementById('expr-area');
+  const controls = document.getElementById('expr-controls');
+  if(!area) return;
+  // Render category tabs
+  if(controls){
+    controls.innerHTML = '<div class="expr-nav">' +
+      '<button class="'+(exprCategory==='english'?'active':'')+'" onclick="switchExpr(\'english\',this)">英语</button>' +
+      '<button class="'+(exprCategory==='politics'?'active':'')+'" onclick="switchExpr(\'politics\',this)">政治</button>' +
+      '<button class="'+(exprCategory==='custom'?'active':'')+'" onclick="switchExpr(\'custom\',this)">自定义</button>' +
+      '</div>';
+  }
+  const cards = exprCards.filter(c=>c.category===exprCategory);
+  if(cards.length===0){
+    area.innerHTML = '<p style="color:var(--text2);font-size:13px;padding:12px 0;">暂无内容，点击下方按钮添加</p>';
+    // Show add form
+    renderExprAddForm(area);
+    return;
+  }
+  const idx = exprCardIdx[exprCategory] % cards.length;
+  const card = cards[idx];
+  const catLabel = exprCategory==='english'?'英语背诵':exprCategory==='politics'?'政治背诵':'自定义';
+  area.innerHTML = '<div class="expr-card" onclick="exprFlipCard()" style="cursor:pointer;min-height:80px;">' +
+    '<div class="expr-type">'+esc(catLabel)+'</div>' +
+    '<div class="expr-content">'+esc(card.front)+'</div>' +
+    (exprShowBack ? '<div class="expr-meaning">'+esc(card.back)+(card.tip?' · <b>'+esc(card.tip)+'</b>':'')+'</div>' :
+    '<div class="expr-meaning" style="color:var(--accent);font-style:italic;">👆 点击翻转查看释义</div>') +
+    '</div>';
+  // Navigation + actions
+  const nav = document.createElement('div');
+  nav.style.cssText='display:flex;justify-content:space-between;align-items:center;margin-top:8px;';
+  nav.innerHTML = '<span style="font-size:11px;color:var(--text2);">'+(idx+1)+' / '+cards.length+'</span>' +
+    '<div style="display:flex;gap:6px;">' +
+    '<button style="padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);cursor:pointer;font-size:12px;color:var(--text2);" onclick="exprPrev()">上一条</button>' +
+    '<button style="padding:4px 10px;border:1px solid var(--border);border-radius:6px;background:var(--card-bg);cursor:pointer;font-size:12px;color:var(--text2);" onclick="exprNext()">下一条</button>' +
+    '<button style="padding:4px 10px;border:1px solid var(--danger)33;border-radius:6px;background:var(--card-bg);cursor:pointer;font-size:12px;color:var(--danger);" onclick="exprDelCard()">删除</button>' +
+    '</div>';
+  area.appendChild(nav);
+  renderExprAddForm(area);
 }
-function exprNext(){const list=currentExprType==='english'?ENGLISH_EXPRS:currentExprType==='politics'?POLITICS_EXPRS:customExprs;exprIdx[currentExprType]=(exprIdx[currentExprType]+1)%list.length;renderExpr();}
-function exprPrev(){const list=currentExprType==='english'?ENGLISH_EXPRS:currentExprType==='politics'?POLITICS_EXPRS:customExprs;exprIdx[currentExprType]=(exprIdx[currentExprType]-1+list.length)%list.length;renderExpr();}
+
+function renderExprAddForm(area){
+  const form = document.createElement('div');
+  form.style.cssText='margin-top:12px;padding-top:10px;border-top:1px dashed var(--border);';
+  form.innerHTML = '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+    '<input type="text" id="expr-add-front" placeholder="正面（要背诵的内容）" style="flex:1;min-width:120px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg);color:var(--text);">' +
+    '<input type="text" id="expr-add-back" placeholder="背面（释义/翻译）" style="flex:1;min-width:120px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg);color:var(--text);">' +
+    '<input type="text" id="expr-add-tip" placeholder="备注（选填）" style="width:100px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg);color:var(--text);">' +
+    '<button onclick="exprAddCard()" style="padding:6px 14px;border:none;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer;font-size:12px;font-weight:600;">+ 添加</button>' +
+    '</div>';
+  area.appendChild(form);
+}
+
+function exprFlipCard(){ exprShowBack=!exprShowBack; renderExpr(); }
+function exprNext(){
+  const cards=exprCards.filter(c=>c.category===exprCategory);
+  if(cards.length===0)return;
+  exprCardIdx[exprCategory]=(exprCardIdx[exprCategory]+1)%cards.length;
+  exprShowBack=false; renderExpr();
+}
+function exprPrev(){
+  const cards=exprCards.filter(c=>c.category===exprCategory);
+  if(cards.length===0)return;
+  exprCardIdx[exprCategory]=(exprCardIdx[exprCategory]-1+cards.length)%cards.length;
+  exprShowBack=false; renderExpr();
+}
+function exprAddCard(){
+  const front=document.getElementById('expr-add-front');
+  const back=document.getElementById('expr-add-back');
+  const tip=document.getElementById('expr-add-tip');
+  if(!front||!front.value.trim())return toast('请输入正面内容');
+  exprCards.push({id:uid(),category:exprCategory,front:front.value.trim(),back:back?back.value.trim():'',tip:tip?tip.value.trim():''});
+  saveStore('myNavExprCards',exprCards);
+  renderExpr();
+  toast('已添加到'+(exprCategory==='english'?'英语':exprCategory==='politics'?'政治':'自定义'));
+}
+function exprDelCard(){
+  const cards=exprCards.filter(c=>c.category===exprCategory);
+  if(cards.length===0)return;
+  const idx=exprCardIdx[exprCategory]%cards.length;
+  const card=cards[idx];
+  if(!confirm('删除这条背诵卡片？'))return;
+  exprCards=exprCards.filter(c=>c.id!==card.id);
+  saveStore('myNavExprCards',exprCards);
+  if(exprCardIdx[exprCategory]>=exprCards.filter(c=>c.category===exprCategory).length){
+    exprCardIdx[exprCategory]=Math.max(0,exprCards.filter(c=>c.category===exprCategory).length-1);
+  }
+  renderExpr();
+  toast('已删除');
+}
 
 // ====== 4-Day Timeline (Enhanced with Rounds) ======
-const CYCLE_START='2026-06-18';
+const CYCLE_START='2026-06-20';
 let timelineRounds=loadStore('myNavTimelineRounds',null);
 let activeRound=0;
 
 // Migrate old data
 if(!timelineRounds){
-  const old=loadStore('myNavTimeline',[]);
-  timelineRounds=[{id:'r1',startDate:CYCLE_START,endDate:addDays(CYCLE_START,3),status:'active',days:Array.from({length:4},(_,i)=>({day:i+1,date:addDays(CYCLE_START,i),tasks:(old[i]&&old[i].tasks)||[]}))}];
+  timelineRounds=[{id:'r1',startDate:CYCLE_START,endDate:addDays(CYCLE_START,3),status:'active',days:Array.from({length:4},(_,i)=>({day:i+1,date:addDays(CYCLE_START,i),tasks:[]}))}];
   saveStore('myNavTimelineRounds',timelineRounds);
 }
 
@@ -1179,9 +1252,13 @@ function ensureCurrentRound(){
   activeRound=timelineRounds.findIndex(r=>r.status==='active');
   if(activeRound<0)activeRound=timelineRounds.length-1;
   saveStore('myNavTimelineRounds',timelineRounds);
-  // Show carry-over modal if there are incomplete tasks
+  // Auto-carryover incomplete tasks to day 1 of new round
   if(incomplete.length>0){
-    showCarryoverModal(incomplete,timelineRounds[activeRound]);
+    const target=timelineRounds[activeRound];
+    incomplete.forEach(t=>{
+      target.days[0].tasks.push({text:t.text,time:t.time,done:false});
+    });
+    saveStore('myNavTimelineRounds',timelineRounds);
   }
 }
 
@@ -1587,7 +1664,7 @@ function renderFeishuEmojiPick(){
 // ====== Resource Library ======
 let resSubjects=loadStore('myNavResSubjects',['数学','英语','政治','专业课','其他']);
 let resLinks=loadStore('myNavResLinks',[]);
-let activeResSubject=0;
+let activeResSubject=-1;
 let resSubCats=loadStore('myNavResSubCats',{});
 let activeSubCat='';
 let resStatusFilter='';
@@ -1661,7 +1738,12 @@ function getPlatformName(url){
 function renderResSubjects(){
   const el=document.getElementById('res-subjects');
   if(!el)return;
-  el.innerHTML=resSubjects.map((s,i)=>{
+  const allCount=resLinks.length;
+  let html=`<div class="res-subject cat-drag ${activeResSubject===-1?'active':''}" onclick="switchResSubject(-1)">
+    <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">📦 资源合集</span>
+    <span class="res-count">${allCount}</span>
+  </div>`;
+  html+=resSubjects.map((s,i)=>{
     const count=resLinks.filter(r=>r.subject===s).length;
     return `<div class="res-subject cat-drag ${i===activeResSubject?'active':''}" draggable="true" data-sub-idx="${i}"
       onclick="switchResSubject(${i})"
@@ -1674,12 +1756,16 @@ function renderResSubjects(){
         <button class="res-sub-btn" onclick="event.stopPropagation();delResSubject(${i})" title="删除">✕</button>
       </span>
     </div>`;
-  }).join('')+`<div class="res-subject-add" onclick="addResSubject()">+ 添加科目</div>
+  }).join('');
+  html+=`<div class="res-subject-add" onclick="addResSubject()">+ 添加科目</div>
   <div class="res-backup-btn" onclick="backupAllResources()">📦 一键备份</div>
   <div class="res-backup-btn" onclick="document.getElementById('res-restore-input').click()" style="border-style:solid;border-color:var(--success);color:var(--success);background:transparent;">📂 恢复备份</div>
   <input type="file" id="res-restore-input" accept=".json" style="display:none" onchange="restoreAllResources(event)">`;
+  el.innerHTML=html;
   renderSubCats();
 }
+
+function switchResSubject(i){activeResSubject=i;activeSubCat='';resStatusFilter='';const sf=document.getElementById('res-status-filter');if(sf)sf.value='';renderResSubjects();renderResGrid();}
 
 // Subject drag-and-drop
 let _subDragIdx=-1;
@@ -1692,8 +1778,6 @@ function onSubDrop(e,i){
   if(_subDragIdx<0||_subDragIdx===i)return;
   const moved=resSubjects.splice(_subDragIdx,1)[0];
   resSubjects.splice(i>_subDragIdx?i-1:i,0,moved);
-  // Also move associated sub-categories
-  // activeResSubject needs update if it was the moved one
   if(activeResSubject===_subDragIdx)activeResSubject=i>_subDragIdx?i-1:i;
   else if(_subDragIdx<activeResSubject&&i>=activeResSubject)activeResSubject--;
   else if(_subDragIdx>activeResSubject&&i<=activeResSubject)activeResSubject++;
@@ -1756,6 +1840,19 @@ function switchResSubject(i){activeResSubject=i;activeSubCat='';resStatusFilter=
 function renderSubCats(){
   const el=document.getElementById('res-subcat-tabs');
   if(!el)return;
+  if(activeResSubject===-1){
+    // 资源合集: show all unique sub-categories + 未分类
+    const allCats=new Set();
+    resLinks.forEach(r=>{if(r.subCategory)allCats.add(r.subCategory);});
+    allCats.add('未分类');
+    const cats=Array.from(allCats);
+    if(cats.length===0){el.innerHTML='';return;}
+    el.innerHTML='<div class="res-subcats">'+
+      `<span class="res-subcat ${activeSubCat===''?'active':''}" onclick="switchSubCat('')">全部</span>`+
+      cats.map(c=>`<span class="res-subcat ${activeSubCat===c?'active':''}" onclick="switchSubCat('${esc(c)}')">${esc(c)}</span>`).join('')+
+      '</div>';
+    return;
+  }
   const subject=resSubjects[activeResSubject];
   const cats=resSubCats[subject]||[];
   if(cats.length===0){el.innerHTML='';return;}
@@ -1812,9 +1909,17 @@ function addResSubject(){
 function renderResGrid(){
   const grid=document.getElementById('res-grid');
   if(!grid)return;
-  const subject=resSubjects[activeResSubject];
-  let items=resLinks.filter(r=>r.subject===subject);
-  if(activeSubCat)items=items.filter(r=>r.subCategory===activeSubCat);
+  let items;
+  if(activeResSubject===-1){
+    // 资源合集: show all resources
+    items=[...resLinks];
+    if(activeSubCat==='未分类'){items=items.filter(r=>!r.subCategory);}
+    else if(activeSubCat){items=items.filter(r=>r.subCategory===activeSubCat);}
+  }else{
+    const subject=resSubjects[activeResSubject];
+    items=resLinks.filter(r=>r.subject===subject);
+    if(activeSubCat)items=items.filter(r=>r.subCategory===activeSubCat);
+  }
   if(resStatusFilter)items=items.filter(r=>(r.status||'unread')===resStatusFilter);
   if(items.length===0){
     grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text3);">暂无资源，点击上方按钮添加</div>';
@@ -1919,14 +2024,15 @@ function delResLink(id){
 
 async function handleFileUpload(e){
   const files=Array.from(e.target.files);
+  const subject=activeResSubject===-1?'资源合集':resSubjects[activeResSubject];
   for(const file of files){
     const id=uid();
     const buf=await file.arrayBuffer();
     await storeFile(id,file.name,file.type,buf);
-    resLinks.push({id,title:file.name,subject:resSubjects[activeResSubject],type:'file',fileType:file.name.split('.').pop().toUpperCase(),addedAt:Date.now()});
+    resLinks.push({id,title:file.name,subject,type:'file',fileType:file.name.split('.').pop().toUpperCase(),subCategory:activeSubCat||(activeResSubject===-1?'未分类':''),addedAt:Date.now()});
   }
   saveStore('myNavResLinks',resLinks);
-  renderResGrid();toast(`${files.length} 个文件已上传`);
+  renderResSubjects();renderResGrid();toast(`${files.length} 个文件已上传`);
   e.target.value='';
 }
 
@@ -1968,12 +2074,13 @@ document.addEventListener('DOMContentLoaded',()=>{
   zone.addEventListener('drop',async e=>{
     e.preventDefault();zone.classList.remove('dragover');
     const files=Array.from(e.dataTransfer.files);
+    const subject=activeResSubject===-1?'资源合集':resSubjects[activeResSubject];
     for(const file of files){
       const id=uid();const buf=await file.arrayBuffer();
       await storeFile(id,file.name,file.type,buf);
-      resLinks.push({id,title:file.name,subject:resSubjects[activeResSubject],type:'file',fileType:file.name.split('.').pop().toUpperCase(),addedAt:Date.now()});
+      resLinks.push({id,title:file.name,subject,type:'file',fileType:file.name.split('.').pop().toUpperCase(),subCategory:activeSubCat||(activeResSubject===-1?'未分类':''),addedAt:Date.now()});
     }
-    saveStore('myNavResLinks',resLinks);renderResGrid();toast(`${files.length} 个文件已上传`);
+    saveStore('myNavResLinks',resLinks);renderResSubjects();renderResGrid();toast(`${files.length} 个文件已上传`);
   });
 });
 
@@ -2037,7 +2144,7 @@ async function quickAddResources(){
   if(!text)return;
   const items=extractUrls(text);
   if(items.length===0){toast('未检测到有效链接');return;}
-  const subject=resSubjects[activeResSubject];
+  const subject=activeResSubject===-1?'资源合集':resSubjects[activeResSubject];
   let added=0;
   for(const item of items){
     let url=item.url;
@@ -2407,7 +2514,6 @@ function removeTag(catId,tag){
 
 // ====== Link CRUD ======
 let editLink=null,editCat=null,selectedColor=0,selectedEmoji='🤖',selectedTag='',defaultTag='';
-function uid(){return 'x'+Math.random().toString(36).substr(2,9);}
 
 function getExistingTags(catId){
   const cat=cats.find(c=>c.id===catId);
@@ -2574,7 +2680,7 @@ updateClock();setInterval(updateClock,10000);
 
 // ====== Export/Import ======
 function exportData(){
-  const all={cats,catOrder,exams,notes,customExprs,feishuKBs,todos,timelineRounds,resSubjects,resLinks:resLinks.filter(r=>r.type==='link'),resSubCats,diaryEntries,collapsed,homeBoardOrder,customBoards,systemBoards};
+  const all={cats,catOrder,exams,notes,customExprs,exprCards,feishuKBs,todos,timelineRounds,resSubjects,resLinks:resLinks.filter(r=>r.type==='link'),resSubCats,diaryEntries,collapsed,homeBoardOrder,customBoards,systemBoards};
   const blob=new Blob([JSON.stringify(all,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='dashboard-backup.json';a.click();toast('数据已导出');
 }
@@ -2589,6 +2695,7 @@ function importData(e){
       if(all.exams)exams=all.exams;
       if(all.notes)notes=all.notes;
       if(all.customExprs)customExprs=all.customExprs;
+      if(all.exprCards)exprCards=all.exprCards;
       if(all.feishuKBs)feishuKBs=all.feishuKBs;
       if(all.todos){todos=all.todos;TODO_CATS.forEach(c=>{if(!todos[c.key])todos[c.key]=[];});}
       if(all.timelineRounds)timelineRounds=all.timelineRounds;
@@ -2601,7 +2708,7 @@ function importData(e){
       if(all.customBoards)customBoards=all.customBoards;
       if(all.systemBoards)systemBoards=all.systemBoards;
       saveStore('myNavCats',cats);saveStore('myNavCatOrder',catOrder);saveStore('myNavExams',exams);
-      saveStore('myNavNotes',notes);saveStore('myNavCustomExprs',customExprs);saveStore('myNavFeishuKBs',feishuKBs);
+      saveStore('myNavNotes',notes);saveStore('myNavCustomExprs',customExprs);saveStore('myNavExprCards',exprCards);saveStore('myNavFeishuKBs',feishuKBs);
       saveStore('myNavTodos',todos);saveStore('myNavTimelineRounds',timelineRounds);
       saveStore('myNavResSubjects',resSubjects);saveStore('myNavResLinks',resLinks);saveStore('myNavResSubCats',resSubCats);saveStore('myNavDiaryEntries',diaryEntries);saveStore('myNavCollapsed',collapsed);
       saveStore('myNavHomeBoardOrder',homeBoardOrder);saveStore('myNavCustomBoards',customBoards);saveStore('myNavSystemBoards',systemBoards);
@@ -2627,7 +2734,7 @@ function esc(s){const d=document.createElement('div');d.textContent=s;return d.i
 // ====== Keyboard ======
 document.addEventListener('keydown',(e)=>{
   const inInput=['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
-  if(e.key==='Escape'){closeLinkModal();closeCatModal();closeFeishuModal();closeSyncModal();closeResLinkModal();closeResPreview();closeBoardSettings();closeElementModal();if(editMode)toggleEditMode();var cm=document.getElementById('carryover-modal');if(cm)cm.classList.remove('show');if(inInput)document.activeElement.blur();return;}
+  if(e.key==='Escape'){closeLinkModal();closeCatModal();closeFeishuModal();closeSyncModal();closeResLinkModal();closeResPreview();var cm=document.getElementById('carryover-modal');if(cm)cm.classList.remove('show');if(inInput)document.activeElement.blur();return;}
   if(inInput)return;
   if(e.key.toLowerCase()==='t')toggleTheme();
 });
@@ -2665,7 +2772,7 @@ function saveSyncToken(){
 }
 
 function getSyncData(){
-  return {cats,catOrder,exams,notes,customExprs,feishuKBs,todos,timelineRounds,resSubjects,resLinks:resLinks.filter(r=>r.type==='link'),resSubCats,diaryEntries,collapsed,homeBoardOrder,customBoards,systemBoards,syncTime:Date.now()};
+  return {cats,catOrder,exams,notes,customExprs,exprCards,feishuKBs,todos,timelineRounds,resSubjects,resLinks:resLinks.filter(r=>r.type==='link'),resSubCats,diaryEntries,collapsed,homeBoardOrder,customBoards,systemBoards,syncTime:Date.now()};
 }
 
 function applySyncData(data){
@@ -2674,6 +2781,7 @@ function applySyncData(data){
   if(data.exams){exams=data.exams;saveStore('myNavExams',exams);}
   if(data.notes){notes=data.notes;saveStore('myNavNotes',notes);}
   if(data.customExprs){customExprs=data.customExprs;saveStore('myNavCustomExprs',customExprs);}
+  if(data.exprCards){exprCards=data.exprCards;saveStore('myNavExprCards',exprCards);}
   if(data.feishuKBs){feishuKBs=data.feishuKBs;saveStore('myNavFeishuKBs',feishuKBs);}
   if(data.feishuUrl){feishuUrl=data.feishuUrl;saveStore('myNavFeishu',feishuUrl);}
   if(data.todos){todos=data.todos;TODO_CATS.forEach(c=>{if(!todos[c.key])todos[c.key]=[];});saveStore('myNavTodos',todos);}
@@ -2795,649 +2903,56 @@ async function autoSync(){
   }catch(e){}
 }
 
-// ====== Board System (Visual Editor) ======
-const SYSTEM_BOARD_IDS = ['board_todo', 'board_expr', 'board_timeline'];
-const SYSTEM_BOARD_DEFAULTS = {
-  board_todo: { title: '✅ 待办事项', icon: '✅', collapsed: false, width: 'full' },
-  board_expr: { title: '📝 每日积累', icon: '📝', collapsed: false, width: 'half' },
-  board_timeline: { title: '📋 四天循环计划', icon: '📋', collapsed: false, width: 'full' }
-};
-const ELEMENT_TYPES = [
-  { type: 'text', name: '文本块', icon: '📝' },
-  { type: 'checklist', name: '待办清单', icon: '☑️' },
-  { type: 'countdown', name: '倒计时', icon: '⏳' },
-  { type: 'image', name: '图片', icon: '🖼️' },
-  { type: 'divider', name: '分隔线', icon: '➖' },
-  { type: 'table', name: '表格', icon: '📊' },
-  { type: 'quote', name: '名言', icon: '💬' },
-  { type: 'linkcard', name: '链接卡片', icon: '🔗' },
-  { type: 'progress', name: '进度条', icon: '📈' },
-  { type: 'iframe', name: '嵌入网页', icon: '🌐' },
-  { type: 'codeblock', name: '代码块', icon: '💻' },
-  { type: 'markdown', name: 'Markdown', icon: '📄' }
-];
 
-let editMode = false;
-let homeBoardOrder = loadStore('myNavHomeBoardOrder', null);
-let customBoards = loadStore('myNavCustomBoards', []);
-let systemBoards = loadStore('myNavSystemBoards', null);
+// ====== Home Page Rendering (Simplified) ======
+let homeBoardOrder = ['board_todo','board_expr','board_timeline'];
+let customBoards = [];
+let systemBoards = {};
+function migrateBoardSystem(){ /* no-op: board system removed */ }
 
-// Migration from legacy
-function migrateBoardSystem() {
-  if (!homeBoardOrder) {
-    homeBoardOrder = ['board_todo', 'board_expr', 'board_timeline'];
-    saveStore('myNavHomeBoardOrder', homeBoardOrder);
-  }
-  if (!systemBoards) {
-    systemBoards = {};
-    const oldCollapsed = loadStore('myNavCollapsed', []);
-    SYSTEM_BOARD_IDS.forEach(id => {
-      const def = SYSTEM_BOARD_DEFAULTS[id];
-      const legacyKey = id === 'board_todo' ? 'todos' : id === 'board_expr' ? 'expr' : 'timeline';
-      systemBoards[id] = { title: def.title, icon: def.icon, collapsed: oldCollapsed.includes(legacyKey), width: def.width };
-    });
-    saveStore('myNavSystemBoards', systemBoards);
-  }
-  // Ensure all system boards exist in order
-  SYSTEM_BOARD_IDS.forEach(id => {
-    if (!homeBoardOrder.includes(id)) homeBoardOrder.push(id);
-  });
-  // Clean up removed board IDs from order
-  homeBoardOrder = homeBoardOrder.filter(id => SYSTEM_BOARD_IDS.includes(id) || customBoards.some(b => b.id === id));
-  saveStore('myNavHomeBoardOrder', homeBoardOrder);
+function toggleHomeCollapse(bodyId, btn){
+  const body = document.getElementById(bodyId);
+  if(!body) return;
+  body.classList.toggle('collapsed');
+  btn.textContent = body.classList.contains('collapsed') ? '▸' : '▾';
 }
 
-function getAllBoards() {
-  return homeBoardOrder.map(id => {
-    if (SYSTEM_BOARD_IDS.includes(id)) {
-      const cfg = systemBoards[id] || SYSTEM_BOARD_DEFAULTS[id];
-      return { id, type: 'system', title: cfg.title, icon: cfg.icon, collapsed: cfg.collapsed, width: cfg.width };
-    }
-    return customBoards.find(b => b.id === id);
-  }).filter(Boolean);
+function renderHomeBoards(){
+  renderTodos();
+  renderExpr();
+  renderHomeStats();
+  ensureCurrentRound();
+  renderTimeline();
 }
 
-function getBoardById(id) {
-  return getAllBoards().find(b => b.id === id) || null;
-}
-
-function saveBoardOrder() { saveStore('myNavHomeBoardOrder', homeBoardOrder); }
-function saveCustomBoards() { saveStore('myNavCustomBoards', customBoards); }
-function saveSystemBoards() { saveStore('myNavSystemBoards', systemBoards); }
-
-// ====== Edit Mode ======
-function toggleEditMode() {
-  editMode = !editMode;
-  document.body.classList.toggle('edit-mode-active', editMode);
-  document.getElementById('edit-toolbar').classList.toggle('show', editMode);
-  renderHomeBoards();
-  if (!editMode) toast('布局已保存');
-}
-
-// ====== Render Home Boards ======
-function renderHomeBoards() {
-  const container = document.getElementById('home-boards');
-  if (!container) return;
-  container.innerHTML = '';
-  const boards = getAllBoards();
-
-  // Separate into grid items and full-width items
-  let gridOpen = false;
-  boards.forEach((board, idx) => {
-    if (board.width === 'half') {
-      if (!gridOpen) {
-        const grid = document.createElement('div');
-        grid.className = 'home-grid';
-        grid.id = 'home-grid-' + idx;
-        container.appendChild(grid);
-        gridOpen = true;
-      }
-      gridOpen && container.lastChild.appendChild(renderBoard(board));
-    } else {
-      if (gridOpen) gridOpen = false;
-      container.appendChild(renderBoard(board));
-    }
-  });
-}
-
-function renderBoard(board) {
-  const wrapper = document.createElement('div');
-  wrapper.className = 'board-wrapper' + (editMode ? ' edit-mode' : '');
-  wrapper.dataset.boardId = board.id;
-  if (board.width === 'full' && board.id === 'board_todo') wrapper.style.gridColumn = '1/-1';
-  if (board.width === 'full' && board.id !== 'board_todo') wrapper.style.marginBottom = '18px';
-
-  // Drag handle + header
-  const isCollapsed = board.collapsed;
-  const isSystem = board.type === 'system';
-
-  let headerHtml = `<div class="hc-title" style="cursor:pointer;">
-    <span class="board-drag-handle" title="拖拽排序">⠿</span>
-    ${esc(board.title || board.icon || '板块')}
-    <span class="hc-collapse-btn" onclick="event.stopPropagation();toggleBoardCollapse('${board.id}')">${isCollapsed ? '▸' : '▾'}</span>
-    <div class="board-actions">
-      <button class="board-action-btn" onclick="event.stopPropagation();openBoardSettings('${board.id}')" title="设置">⚙️</button>
-      ${!isSystem ? `<button class="board-action-btn danger" onclick="event.stopPropagation();deleteBoard('${board.id}')" title="删除">✕</button>` : ''}
-    </div>
-  </div>`;
-
-  wrapper.innerHTML = headerHtml;
-
-  // Body
-  const body = document.createElement('div');
-  body.className = 'hc-body' + (isCollapsed ? ' collapsed' : '');
-
-  if (board.id === 'board_todo') {
-    const inner = document.createElement('div');
-    inner.className = 'todo-cats';
-    inner.id = 'todo-cats';
-    body.appendChild(inner);
-  } else if (board.id === 'board_expr') {
-    const inner = document.createElement('div');
-    inner.id = 'expr-body-inner';
-    inner.innerHTML = '<div id="expr-area"></div><div class="expr-nav"><button class="active" onclick="switchExpr(\'english\',this)">英语表达</button><button onclick="switchExpr(\'politics\',this)">政治背诵</button><button onclick="switchExpr(\'custom\',this)">自定义</button></div>';
-    body.appendChild(inner);
-  } else if (board.id === 'board_timeline') {
-    const inner = document.createElement('div');
-    inner.id = 'timeline-inner';
-    inner.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;"><h3 style="font-size:16px;font-weight:600;">📋 四天循环计划</h3><div class="timeline-nav" id="cycle-nav"></div></div><div class="timeline-grid" id="timeline-grid"></div>';
-    body.appendChild(inner);
-  } else if (board.type === 'custom') {
-    renderCustomBoardBody(body, board);
-  }
-
-  wrapper.appendChild(body);
-
-  // Drag events for edit mode
-  if (editMode) {
-    wrapper.draggable = true;
-    wrapper.addEventListener('dragstart', onBoardDragStart);
-    wrapper.addEventListener('dragend', onBoardDragEnd);
-    wrapper.addEventListener('dragover', onBoardDragOver);
-    wrapper.addEventListener('dragleave', onBoardDragLeave);
-    wrapper.addEventListener('drop', onBoardDrop);
-  }
-
-  return wrapper;
-}
-
-function renderCustomBoardBody(container, board) {
-  const elements = board.elements || [];
-  elements.forEach((el, idx) => {
-    const elDiv = document.createElement('div');
-    elDiv.className = 'board-element' + (editMode ? ' edit-mode' : '');
-    elDiv.dataset.elId = el.id;
-    elDiv.dataset.boardId = board.id;
-
-    if (editMode) {
-      elDiv.innerHTML = `<div class="element-controls">
-        <button onclick="moveElement('${board.id}','${el.id}',-1)" title="上移">↑</button>
-        <button onclick="moveElement('${board.id}','${el.id}',1)" title="下移">↓</button>
-        <button onclick="openElementEditor('${board.id}','${el.id}')" title="编辑">✏️</button>
-        <button class="ec-del" onclick="deleteElement('${board.id}','${el.id}')" title="删除">✕</button>
-      </div>`;
-    }
-
-    const content = renderElement(el);
-    elDiv.appendChild(content);
-    container.appendChild(elDiv);
-  });
-
-  if (editMode) {
-    const addBtn = document.createElement('button');
-    addBtn.className = 'add-element-btn';
-    addBtn.innerHTML = '+ 添加元素';
-    addBtn.onclick = () => openAddElementPicker(board.id);
-    container.appendChild(addBtn);
-
-    const picker = document.createElement('div');
-    picker.className = 'el-type-picker';
-    picker.id = 'el-picker-' + board.id;
-    ELEMENT_TYPES.forEach(et => {
-      const btn = document.createElement('button');
-      btn.innerHTML = et.icon + ' ' + et.name;
-      btn.onclick = () => { picker.classList.remove('show'); addNewElement(board.id, et.type); };
-      picker.appendChild(btn);
-    });
-    container.appendChild(picker);
-  }
-}
-
-// ====== Element Renderers ======
-function renderElement(el) {
-  const d = document.createElement('div');
-  switch (el.type) {
-    case 'text': d.className = 'el-text'; d.textContent = el.data.content || ''; break;
-    case 'checklist': {
-      (el.data.items || []).forEach((item, i) => {
-        const row = document.createElement('div');
-        row.className = 'el-checklist-item' + (item.checked ? ' done' : '');
-        row.innerHTML = `<input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleChecklistItem('${el.id}',${i})"><label>${esc(item.text)}</label>`;
-        d.appendChild(row);
-      });
-      break;
-    }
-    case 'countdown': {
-      d.className = 'el-countdown-card';
-      const target = new Date(el.data.targetDate);
-      const now = new Date(); now.setHours(0,0,0,0); target.setHours(0,0,0,0);
-      const diff = Math.ceil((target - now) / 86400000);
-      const label = diff > 0 ? diff + ' 天' : diff === 0 ? '今天' : '已过 ' + Math.abs(diff) + ' 天';
-      d.innerHTML = `<div class="el-countdown-num">${diff > 0 ? diff : 0}</div><div class="el-countdown-label">${esc(el.data.label || '')} · ${label}</div>`;
-      break;
-    }
-    case 'image': {
-      d.className = 'el-image';
-      if (el.data.src) {
-        d.innerHTML = `<img src="${esc(el.data.src)}" alt="${esc(el.data.alt || '')}">${el.data.caption ? '<div class="el-caption">' + esc(el.data.caption) + '</div>' : ''}`;
-      } else {
-        d.innerHTML = '<p style="color:var(--text2);text-align:center;">暂无图片</p>';
-      }
-      break;
-    }
-    case 'divider':
-      d.className = 'el-divider ' + (el.data.style || 'solid');
-      d.innerHTML = '<hr>';
-      break;
-    case 'table': {
-      const headers = el.data.headers || [];
-      const rows = el.data.rows || [];
-      let html = '<table class="el-table"><thead><tr>' + headers.map(h => '<th>' + esc(h) + '</th>').join('') + '</tr></thead><tbody>';
-      rows.forEach(row => { html += '<tr>' + row.map(c => '<td>' + esc(c) + '</td>').join('') + '</tr>'; });
-      html += '</tbody></table>';
-      d.innerHTML = html;
-      break;
-    }
-    case 'quote':
-      d.className = 'el-quote';
-      d.innerHTML = esc(el.data.text || '') + (el.data.author ? '<div class="el-quote-author">— ' + esc(el.data.author) + '</div>' : '');
-      break;
-    case 'linkcard': {
-      const icon = el.data.icon || '🔗';
-      d.innerHTML = `<a class="el-linkcard" href="${esc(el.data.url || '#')}" target="_blank">
-        <span class="el-lc-icon">${icon}</span>
-        <div><div class="el-lc-title">${esc(el.data.title || '')}</div>
-        ${el.data.desc ? '<div class="el-lc-desc">' + esc(el.data.desc) + '</div>' : ''}</div></a>`;
-      break;
-    }
-    case 'progress': {
-      const val = Math.min(Math.max(el.data.value || 0, 0), el.data.max || 100);
-      const pct = Math.round(val / (el.data.max || 100) * 100);
-      d.className = 'el-progress-wrap';
-      d.innerHTML = `<div class="el-progress-label"><span>${esc(el.data.label || '')}</span><span>${pct}%</span></div>
-        <div class="el-progress-bar"><div class="el-progress-fill" style="width:${pct}%;background:${el.data.color || 'var(--accent)'}"></div></div>`;
-      break;
-    }
-    case 'iframe':
-      d.className = 'el-iframe';
-      d.innerHTML = `<iframe src="${esc(el.data.url || '')}" style="height:${el.data.height || 400}px" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>`;
-      break;
-    case 'codeblock':
-      d.innerHTML = `<pre class="el-codeblock"><code>${esc(el.data.code || '')}</code></pre>`;
-      break;
-    case 'markdown':
-      d.className = 'el-markdown';
-      d.innerHTML = parseMarkdown(el.data.content || '');
-      break;
-    default:
-      d.innerHTML = '<p style="color:var(--text2);">未知元素类型</p>';
-  }
-  return d;
-}
-
-// ====== Simple Markdown Parser ======
-function parseMarkdown(md) {
-  let html = md
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/`(.+?)`/g, '<code>$1</code>')
-    .replace(/^\> (.+)$/gm, '<blockquote>$1</blockquote>')
-    .replace(/^- (.+)$/gm, '<li>$1</li>')
-    .replace(/^---$/gm, '<hr>')
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank">$1</a>')
-    .replace(/\n/g, '<br>');
-  // Wrap consecutive <li> in <ul>
-  html = html.replace(/((?:<li>.*?<\/li><br>?)+)/g, (m) => '<ul>' + m.replace(/<br>/g, '') + '</ul>');
-  return html;
-}
-
-// ====== Board CRUD ======
-function addCustomBoard() {
-  const title = prompt('输入新板块名称：');
-  if (!title || !title.trim()) return;
-  const id = 'board_custom_' + uid();
-  customBoards.push({ id, type: 'custom', title: title.trim(), icon: '📌', collapsed: false, width: 'full', elements: [] });
-  homeBoardOrder.push(id);
-  saveCustomBoards(); saveBoardOrder();
-  renderHomeBoards();
-  toast('板块已添加');
-}
-
-function deleteBoard(boardId) {
-  if (SYSTEM_BOARD_IDS.includes(boardId)) return;
-  const board = customBoards.find(b => b.id === boardId);
-  if (!board) return;
-  if (!confirm('删除板块「' + board.title + '」及其所有元素？')) return;
-  customBoards = customBoards.filter(b => b.id !== boardId);
-  homeBoardOrder = homeBoardOrder.filter(id => id !== boardId);
-  saveCustomBoards(); saveBoardOrder();
-  renderHomeBoards();
-  toast('板块已删除');
-}
-
-function renameBoard(boardId) {
-  const board = getBoardById(boardId);
-  if (!board) return;
-  const name = prompt('输入新名称：', board.title);
-  if (!name || !name.trim()) return;
-  if (SYSTEM_BOARD_IDS.includes(boardId)) {
-    systemBoards[boardId].title = name.trim();
-    saveSystemBoards();
-  } else {
-    board.title = name.trim();
-    saveCustomBoards();
-  }
-  renderHomeBoards();
-}
-
-function toggleBoardCollapse(boardId) {
-  if (SYSTEM_BOARD_IDS.includes(boardId)) {
-    systemBoards[boardId].collapsed = !systemBoards[boardId].collapsed;
-    saveSystemBoards();
-  } else {
-    const board = customBoards.find(b => b.id === boardId);
-    if (board) { board.collapsed = !board.collapsed; saveCustomBoards(); }
-  }
-  // Toggle CSS
-  const wrapper = document.querySelector(`[data-board-id="${boardId}"]`);
-  if (wrapper) {
-    const body = wrapper.querySelector('.hc-body');
-    const btn = wrapper.querySelector('.hc-collapse-btn');
-    if (body) body.classList.toggle('collapsed');
-    if (btn) btn.textContent = body && body.classList.contains('collapsed') ? '▸' : '▾';
-  }
-}
-
-function openBoardSettings(boardId) {
-  const board = getBoardById(boardId);
-  if (!board) return;
-  document.getElementById('f-board-id').value = boardId;
-  document.getElementById('f-board-name').value = board.title;
-  document.getElementById('f-board-width').value = board.width || 'full';
-  document.getElementById('board-settings-title').textContent = '板块设置 - ' + board.title;
-  document.getElementById('board-settings-modal').classList.add('show');
-}
-
-function closeBoardSettings() { document.getElementById('board-settings-modal').classList.remove('show'); }
-
-function saveBoardSettings() {
-  const boardId = document.getElementById('f-board-id').value;
-  const name = document.getElementById('f-board-name').value.trim();
-  const width = document.getElementById('f-board-width').value;
-  if (!name) return toast('名称不能为空');
-  if (SYSTEM_BOARD_IDS.includes(boardId)) {
-    systemBoards[boardId].title = name;
-    systemBoards[boardId].width = width;
-    saveSystemBoards();
-  } else {
-    const board = customBoards.find(b => b.id === boardId);
-    if (board) { board.title = name; board.width = width; saveCustomBoards(); }
-  }
-  closeBoardSettings();
-  renderHomeBoards();
-  toast('设置已保存');
-}
-
-// ====== Element CRUD ======
-function openAddElementPicker(boardId) {
-  const picker = document.getElementById('el-picker-' + boardId);
-  if (picker) picker.classList.toggle('show');
-}
-
-function getDefaultElementData(type) {
-  const today = new Date();
-  const nextWeek = new Date(today.getTime() + 7 * 86400000).toISOString().slice(0, 10);
-  switch (type) {
-    case 'text': return { content: '' };
-    case 'checklist': return { items: [{ id: uid(), text: '新任务', checked: false }] };
-    case 'countdown': return { label: '倒计时', targetDate: nextWeek };
-    case 'image': return { src: '', alt: '', caption: '' };
-    case 'divider': return { style: 'solid' };
-    case 'table': return { headers: ['列1', '列2'], rows: [['', '']] };
-    case 'quote': return { text: '', author: '' };
-    case 'linkcard': return { title: '', url: '', desc: '', icon: '🔗' };
-    case 'progress': return { label: '进度', value: 0, max: 100, color: '' };
-    case 'iframe': return { url: '', height: 400 };
-    case 'codeblock': return { code: '' };
-    case 'markdown': return { content: '' };
-    default: return {};
-  }
-}
-
-function addNewElement(boardId, type) {
-  const board = customBoards.find(b => b.id === boardId);
-  if (!board) return;
-  const el = { id: uid(), type, data: getDefaultElementData(type) };
-  board.elements.push(el);
-  saveCustomBoards();
-  openElementEditor(boardId, el.id);
-}
-
-function openElementEditor(boardId, elId) {
-  const board = customBoards.find(b => b.id === boardId);
-  if (!board) return;
-  const el = board.elements.find(e => e.id === elId);
-  if (!el) return;
-  document.getElementById('f-el-board-id').value = boardId;
-  document.getElementById('f-el-id').value = elId;
-  document.getElementById('f-el-type').value = el.type;
-  const etInfo = ELEMENT_TYPES.find(t => t.type === el.type);
-  document.getElementById('element-modal-title').textContent = '编辑 ' + (etInfo ? etInfo.name : '元素');
-
-  const fields = document.getElementById('el-form-fields');
-  fields.innerHTML = buildElementForm(el);
-  document.getElementById('element-modal').classList.add('show');
-}
-
-function buildElementForm(el) {
-  const d = el.data;
-  switch (el.type) {
-    case 'text':
-      return `<label>内容</label><textarea id="ef-content" rows="5" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);resize:vertical;font-family:inherit;">${esc(d.content || '')}</textarea>`;
-    case 'checklist':
-      return `<label>清单项目（每行一个，✅开头表示已完成）</label><textarea id="ef-items" rows="6" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);resize:vertical;font-family:inherit;">${(d.items || []).map(i => (i.checked ? '✅ ' : '') + i.text).join('\n')}</textarea>`;
-    case 'countdown':
-      return `<label>标签</label><input type="text" id="ef-label" value="${esc(d.label || '')}" placeholder="例如：期末考试">
-        <label>目标日期</label><input type="date" id="ef-date" value="${d.targetDate || ''}">`;
-    case 'image':
-      return `<label>图片地址（URL 或 base64）</label><input type="text" id="ef-src" value="${esc(d.src || '')}" placeholder="https://...">
-        <label>替代文字</label><input type="text" id="ef-alt" value="${esc(d.alt || '')}" placeholder="图片描述">
-        <label>说明文字</label><input type="text" id="ef-caption" value="${esc(d.caption || '')}" placeholder="图片下方说明">
-        <label>或上传本地图片</label><input type="file" id="ef-file" accept="image/*" onchange="handleElImageUpload(this)">`;
-    case 'divider':
-      return `<label>样式</label><select id="ef-style"><option value="solid" ${d.style === 'solid' ? 'selected' : ''}>实线</option><option value="dashed" ${d.style === 'dashed' ? 'selected' : ''}>虚线</option><option value="dotted" ${d.style === 'dotted' ? 'selected' : ''}>点线</option></select>`;
-    case 'table':
-      return `<label>表头（逗号分隔）</label><input type="text" id="ef-headers" value="${esc((d.headers || []).join(','))}" placeholder="列1,列2,列3">
-        <label>数据行（每行逗号分隔）</label><textarea id="ef-rows" rows="5" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);resize:vertical;font-family:inherit;">${(d.rows || []).map(r => r.join(',')).join('\n')}</textarea>`;
-    case 'quote':
-      return `<label>名言内容</label><textarea id="ef-text" rows="3" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);resize:vertical;font-family:inherit;">${esc(d.text || '')}</textarea>
-        <label>作者</label><input type="text" id="ef-author" value="${esc(d.author || '')}" placeholder="作者名">`;
-    case 'linkcard':
-      return `<label>标题</label><input type="text" id="ef-title" value="${esc(d.title || '')}" placeholder="链接标题">
-        <label>网址</label><input type="url" id="ef-url" value="${esc(d.url || '')}" placeholder="https://...">
-        <label>描述</label><input type="text" id="ef-desc" value="${esc(d.desc || '')}" placeholder="简短描述">
-        <label>图标（emoji）</label><input type="text" id="ef-icon" value="${esc(d.icon || '🔗')}" placeholder="🔗" style="width:60px;">`;
-    case 'progress':
-      return `<label>标签</label><input type="text" id="ef-label" value="${esc(d.label || '')}" placeholder="进度名称">
-        <label>当前值</label><input type="number" id="ef-value" value="${d.value || 0}" min="0">
-        <label>最大值</label><input type="number" id="ef-max" value="${d.max || 100}" min="1">
-        <label>颜色</label><input type="color" id="ef-color" value="${d.color || '#4361ee'}">`;
-    case 'iframe':
-      return `<label>网页地址</label><input type="url" id="ef-url" value="${esc(d.url || '')}" placeholder="https://...">
-        <label>高度（px）</label><input type="number" id="ef-height" value="${d.height || 400}" min="100" max="2000">`;
-    case 'codeblock':
-      return `<label>代码</label><textarea id="ef-code" rows="8" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:13px;background:var(--bg);color:var(--text);resize:vertical;font-family:monospace;">${esc(d.code || '')}</textarea>`;
-    case 'markdown':
-      return `<label>Markdown 内容</label><textarea id="ef-content" rows="8" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);color:var(--text);resize:vertical;font-family:inherit;">${esc(d.content || '')}</textarea>
-        <p style="font-size:11px;color:var(--text2);margin-top:4px;">支持：# 标题、**粗体**、*斜体*、\`代码\`、[链接](url)、- 列表、> 引用</p>`;
-    default: return '<p>不支持的元素类型</p>';
-  }
-}
-
-function handleElImageUpload(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    document.getElementById('ef-src').value = e.target.result;
-    toast('图片已加载');
-  };
-  reader.readAsDataURL(file);
-}
-
-function closeElementModal() { document.getElementById('element-modal').classList.remove('show'); }
-
-function saveElement() {
-  const boardId = document.getElementById('f-el-board-id').value;
-  const elId = document.getElementById('f-el-id').value;
-  const type = document.getElementById('f-el-type').value;
-  const board = customBoards.find(b => b.id === boardId);
-  if (!board) return;
-  const el = board.elements.find(e => e.id === elId);
-  if (!el) return;
-
-  const gv = (id) => { const e = document.getElementById(id); return e ? e.value : ''; };
-
-  switch (type) {
-    case 'text': el.data = { content: gv('ef-content') }; break;
-    case 'checklist':
-      el.data = { items: gv('ef-items').split('\n').filter(l => l.trim()).map(line => {
-        const checked = line.trim().startsWith('✅');
-        return { id: uid(), text: line.replace(/^✅\s*/, '').trim(), checked };
-      })}; break;
-    case 'countdown': el.data = { label: gv('ef-label'), targetDate: gv('ef-date') }; break;
-    case 'image': el.data = { src: gv('ef-src'), alt: gv('ef-alt'), caption: gv('ef-caption') }; break;
-    case 'divider': el.data = { style: gv('ef-style') }; break;
-    case 'table':
-      el.data = {
-        headers: gv('ef-headers').split(',').map(s => s.trim()),
-        rows: gv('ef-rows').split('\n').filter(l => l.trim()).map(r => r.split(',').map(s => s.trim()))
-      }; break;
-    case 'quote': el.data = { text: gv('ef-text'), author: gv('ef-author') }; break;
-    case 'linkcard': el.data = { title: gv('ef-title'), url: gv('ef-url'), desc: gv('ef-desc'), icon: gv('ef-icon') || '🔗' }; break;
-    case 'progress': el.data = { label: gv('ef-label'), value: parseInt(gv('ef-value')) || 0, max: parseInt(gv('ef-max')) || 100, color: gv('ef-color') }; break;
-    case 'iframe': el.data = { url: gv('ef-url'), height: parseInt(gv('ef-height')) || 400 }; break;
-    case 'codeblock': el.data = { code: gv('ef-code') }; break;
-    case 'markdown': el.data = { content: gv('ef-content') }; break;
-  }
-
-  saveCustomBoards();
-  closeElementModal();
-  renderHomeBoards();
-  // Re-render system boards after custom boards
-  if (homeBoardOrder.includes('board_todo')) renderTodos();
-  if (homeBoardOrder.includes('board_expr')) renderExpr();
-  if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
-  toast('元素已保存');
-}
-
-function deleteElement(boardId, elId) {
-  const board = customBoards.find(b => b.id === boardId);
-  if (!board) return;
-  board.elements = board.elements.filter(e => e.id !== elId);
-  saveCustomBoards();
-  renderHomeBoards();
-  // Re-render system boards
-  if (homeBoardOrder.includes('board_todo')) renderTodos();
-  if (homeBoardOrder.includes('board_expr')) renderExpr();
-  if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
-}
-
-function moveElement(boardId, elId, dir) {
-  const board = customBoards.find(b => b.id === boardId);
-  if (!board) return;
-  const idx = board.elements.findIndex(e => e.id === elId);
-  const newIdx = idx + dir;
-  if (newIdx < 0 || newIdx >= board.elements.length) return;
-  [board.elements[idx], board.elements[newIdx]] = [board.elements[newIdx], board.elements[idx]];
-  saveCustomBoards();
-  renderHomeBoards();
-  // Re-render system boards
-  if (homeBoardOrder.includes('board_todo')) renderTodos();
-  if (homeBoardOrder.includes('board_expr')) renderExpr();
-  if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
-}
-
-function toggleChecklistItem(elId, itemIdx) {
-  // Find element across all custom boards
-  for (const board of customBoards) {
-    const el = board.elements.find(e => e.id === elId);
-    if (el && el.type === 'checklist') {
-      el.data.items[itemIdx].checked = !el.data.items[itemIdx].checked;
-      saveCustomBoards();
-      renderHomeBoards();
-      if (homeBoardOrder.includes('board_todo')) renderTodos();
-      if (homeBoardOrder.includes('board_expr')) renderExpr();
-      if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
-      return;
-    }
-  }
-}
-
-// ====== Board Drag & Drop ======
-let boardDragId = null;
-function onBoardDragStart(e) {
-  boardDragId = this.dataset.boardId;
-  this.classList.add('dragging');
-  e.dataTransfer.effectAllowed = 'move';
-}
-function onBoardDragEnd() {
-  this.classList.remove('dragging');
-  document.querySelectorAll('.board-wrapper.drag-over').forEach(el => el.classList.remove('drag-over'));
-  boardDragId = null;
-}
-function onBoardDragOver(e) {
-  e.preventDefault();
-  if (this.dataset.boardId && this.dataset.boardId !== boardDragId) {
-    this.classList.add('drag-over');
-  }
-}
-function onBoardDragLeave() { this.classList.remove('drag-over'); }
-function onBoardDrop(e) {
-  e.preventDefault();
-  this.classList.remove('drag-over');
-  const targetId = this.dataset.boardId;
-  if (!boardDragId || !targetId || boardDragId === targetId) return;
-  const fromIdx = homeBoardOrder.indexOf(boardDragId);
-  const toIdx = homeBoardOrder.indexOf(targetId);
-  if (fromIdx < 0 || toIdx < 0) return;
-  homeBoardOrder.splice(fromIdx, 1);
-  homeBoardOrder.splice(toIdx, 0, boardDragId);
-  saveBoardOrder();
-  renderHomeBoards();
-  if (homeBoardOrder.includes('board_todo')) renderTodos();
-  if (homeBoardOrder.includes('board_expr')) renderExpr();
-  if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
-  toast('板块顺序已更新');
+function renderHomeStats(){
+  const el=document.getElementById('home-stats');
+  if(!el)return;
+  const today=new Date().toISOString().slice(0,10);
+  // Count todos
+  let totalTodo=0,doneTodo=0;
+  TODO_CATS.forEach(c=>{const items=todos[c.key]||[];totalTodo+=items.length;doneTodo+=items.filter(t=>t.done).length;});
+  // Study time today
+  let todayMin=0;
+  TODO_CATS.forEach(c=>{(todos[c.key]||[]).forEach(t=>{if(t.lastStudyDate===today)todayMin+=(t.todayMinutes||0);});});
+  // Diary
+  const hasDiary=diaryEntries[today]&&(diaryEntries[today].learned||diaryEntries[today].review||diaryEntries[today].essay);
+  // Streak
+  const streak=calculateStreak();
+  el.innerHTML=`
+    <div>📝 待办进度：${doneTodo} / ${totalTodo} 已完成</div>
+    <div>📅 今日学习：${todayMin>0?todayMin+'分钟':'暂无记录'}</div>
+    <div>🔥 打卡连续：${streak.current} 天（最长 ${streak.best} 天）</div>
+    <div>📖 今日日记：${hasDiary?'已写':'未写'}</div>
+    <div>📚 资源总数：${resLinks.length}</div>`;
 }
 
 // ====== Init ======
 migrateBoardSystem();
-renderNav();renderExams();renderHomeBoards();renderNotes();renderFeishuKBs();renderDiaryLayout();
-// Render system board content after DOM is ready
-setTimeout(() => {
-  if (homeBoardOrder.includes('board_todo')) renderTodos();
-  if (homeBoardOrder.includes('board_expr')) renderExpr();
-  if (homeBoardOrder.includes('board_timeline')) { ensureCurrentRound(); renderTimeline(); }
-}, 50);
+renderNav();renderExams();renderNotes();renderFeishuKBs();renderDiaryLayout();
+setTimeout(() => { renderHomeBoards(); }, 50);
 autoSync().then(()=>{_autoUploadReady=true;});
-// Re-sync when page becomes visible (switching tabs, unlocking phone)
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)silentDownload();});
-// Periodic sync every 5 minutes
 setInterval(()=>{silentDownload();},300000);
 </script>
 </body>
