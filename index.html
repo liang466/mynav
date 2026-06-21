@@ -5069,19 +5069,28 @@ let mathMethods=JSON.parse(localStorage.getItem('myNavMathMethods')||'[]');
 let methodFilterChapter='all';
 function saveMathMethods(){saveStore('myNavMathMethods',mathMethods);}
 function setMethodFilter(ch){methodFilterChapter=ch;renderNotes();}
-function addMethod(){
+async function addMethod(){
   const subject=activeNoteSub||'math';
   const titleEl=document.getElementById('method-title');
   const chSel=document.getElementById('method-chapter');
   const descEl=document.getElementById('method-desc');
   const exEl=document.getElementById('method-example');
+  const fileInput=document.getElementById('method-img-input');
   if(!titleEl||!chSel)return;
   const title=titleEl.value.trim();
   if(!title){toast('请输入方法名称');return;}
-  mathMethods.unshift({id:'mt_'+Date.now(),subject,chapter:chSel.value,title,desc:(descEl?descEl.value.trim():''),example:(exEl?exEl.value.trim():''),createdAt:Date.now()});
+  let imgId=null,imgName=null;
+  if(fileInput&&fileInput.files&&fileInput.files[0]){
+    const file=fileInput.files[0];
+    imgId='mti_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
+    imgName=file.name;
+    const buf=await file.arrayBuffer();
+    await saveNoteImage(imgId,subject,imgName,buf);
+  }
+  mathMethods.unshift({id:'mt_'+Date.now(),subject,chapter:chSel.value,title,desc:(descEl?descEl.value.trim():''),example:(exEl?exEl.value.trim():''),imgId,imgName,createdAt:Date.now()});
   saveMathMethods();renderNotes();toast('方法已添加');
 }
-function delMethod(id){if(!confirm('删除此方法？'))return;mathMethods=mathMethods.filter(m=>m.id!==id);saveMathMethods();renderNotes();toast('已删除');}
+function delMethod(id){if(!confirm('删除此方法？'))return;var m=mathMethods.find(function(x){return x.id===id;});if(m&&m.imgId)deleteNoteImage(m.imgId);mathMethods=mathMethods.filter(function(x){return x.id!==id;});saveMathMethods();renderNotes();toast('已删除');}
 function renderMethods(){
   var subject=activeNoteSub||'math';
   var topics=getMethodTopics(subject);
@@ -5102,9 +5111,12 @@ function renderMethods(){
   h+='</select></div>';
   h+='<textarea id="method-desc" placeholder="方法描述/解题思路..." style="margin-bottom:8px;"></textarea>';
   h+='<textarea id="method-example" placeholder="典型例题（选填）..." style="min-height:50px;"></textarea>';
+  h+='<div class="mistake-drop-zone" id="method-drop-zone" style="border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;margin:8px 0;color:var(--text2);font-size:13px;">';
+  h+='📎 拖拽截图到这里，或点击选择<br><input type="file" id="method-img-input" accept="image/*" style="display:none"><span style="font-size:11px;opacity:0.7">支持 JPG / PNG / WEBP</span></div>';
+  h+='<img id="method-preview" class="ma-preview" style="display:none">';
   h+='<button id="method-add-btn" style="margin-top:8px;padding:7px 18px;border:none;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer;font-size:12px;font-weight:600;">添加</button></div>';
   if(filtered.length===0){h+='<div style="text-align:center;color:var(--text2);padding:30px 0;font-size:13px;">暂无方法记录</div>';}
-  else{filtered.forEach(function(m){var topicName='';topics.forEach(function(tp){if(tp.id===m.chapter)topicName=tp.name;});h+='<div class="method-card">';h+='<span class="method-del" data-mtid="'+m.id+'">✕</span>';h+='<div class="method-title">'+esc(m.title)+'</div>';h+='<div class="method-chapter">'+esc(topicName||'未分类')+'</div>';if(m.desc)h+='<div class="method-desc">'+esc(m.desc)+'</div>';if(m.example)h+='<div class="method-example">'+esc(m.example)+'</div>';h+='</div>';});}
+  else{filtered.forEach(function(m){var topicName='';topics.forEach(function(tp){if(tp.id===m.chapter)topicName=tp.name;});h+='<div class="method-card">';h+='<span class="method-del" data-mtid="'+m.id+'">✕</span>';h+='<div class="method-title">'+esc(m.title)+'</div>';h+='<div class="method-chapter">'+esc(topicName||'未分类')+'</div>';if(m.imgId){h+='<img class="mistake-img" src="" data-imgid="'+m.imgId+'" style="display:none;max-width:100%;max-height:240px;border-radius:8px;margin:6px 0;cursor:pointer">';}if(m.desc)h+='<div class="method-desc">'+esc(m.desc)+'</div>';if(m.example)h+='<div class="method-example">'+esc(m.example)+'</div>';h+='</div>';});}
   return h;
 }
 function attachMethodListeners(){
@@ -5122,6 +5134,23 @@ function attachMethodListeners(){
   });
   var addBtn=document.getElementById('method-add-btn');
   if(addBtn)addBtn.addEventListener('click',addMethod);
+  var imgInput=document.getElementById('method-img-input');
+  var dropZone=document.getElementById('method-drop-zone');
+  if(dropZone){
+    dropZone.addEventListener('click',function(){if(imgInput)imgInput.click();});
+    dropZone.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();dropZone.style.borderColor='var(--accent)';dropZone.style.background='rgba(59,130,246,0.05)';});
+    dropZone.addEventListener('dragleave',function(e){e.preventDefault();dropZone.style.borderColor='var(--border)';dropZone.style.background='';});
+    dropZone.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();dropZone.style.borderColor='var(--border)';dropZone.style.background='';if(e.dataTransfer.files.length>0&&imgInput){imgInput.files=e.dataTransfer.files;var ev=new Event('change');imgInput.dispatchEvent(ev);}});
+  }
+  if(imgInput){
+    imgInput.addEventListener('change',function(){
+      if(this.files&&this.files[0]){var p=document.getElementById('method-preview');if(p){p.src=URL.createObjectURL(this.files[0]);p.style.display='block';}}
+    });
+  }
+  document.querySelectorAll('.method-card .mistake-img[data-imgid]').forEach(function(el){
+    el.addEventListener('click',function(){notesOpenViewerFromMistake(this.dataset.imgid);});
+    getNoteImage(el.dataset.imgid).then(function(img){if(img){el.src=URL.createObjectURL(new Blob([img.data]));el.style.display='block';}});
+  });
 }
 
 // ====== Theorem Library ======
@@ -5129,20 +5158,29 @@ let mathTheorems=JSON.parse(localStorage.getItem('myNavMathTheorems')||'[]');
 let theoremFilterChapter='all';
 function saveMathTheorems(){saveStore('myNavMathTheorems',mathTheorems);}
 function setTheoremFilter(ch){theoremFilterChapter=ch;renderNotes();}
-function addTheorem(){
+async function addTheorem(){
   const subject=activeNoteSub||'math';
   const nameEl=document.getElementById('theorem-name');
   const chSel=document.getElementById('theorem-chapter');
   const condEl=document.getElementById('theorem-cond');
   const bodyEl=document.getElementById('theorem-body');
   const noteEl=document.getElementById('theorem-note');
+  const fileInput=document.getElementById('theorem-img-input');
   if(!nameEl||!chSel)return;
   const name=nameEl.value.trim();
   if(!name){toast('请输入定理名称');return;}
-  mathTheorems.unshift({id:'th_'+Date.now(),subject,chapter:chSel.value,name,cond:(condEl?condEl.value.trim():''),body:(bodyEl?bodyEl.value.trim():''),note:(noteEl?noteEl.value.trim():''),createdAt:Date.now()});
+  let imgId=null,imgName=null;
+  if(fileInput&&fileInput.files&&fileInput.files[0]){
+    const file=fileInput.files[0];
+    imgId='thi_'+Date.now()+'_'+Math.random().toString(36).substr(2,6);
+    imgName=file.name;
+    const buf=await file.arrayBuffer();
+    await saveNoteImage(imgId,subject,imgName,buf);
+  }
+  mathTheorems.unshift({id:'th_'+Date.now(),subject,chapter:chSel.value,name,cond:(condEl?condEl.value.trim():''),body:(bodyEl?bodyEl.value.trim():''),note:(noteEl?noteEl.value.trim():''),imgId,imgName,createdAt:Date.now()});
   saveMathTheorems();renderNotes();toast('定理已添加');
 }
-function delTheorem(id){if(!confirm('删除此定理？'))return;mathTheorems=mathTheorems.filter(t=>t.id!==id);saveMathTheorems();renderNotes();toast('已删除');}
+function delTheorem(id){if(!confirm('删除此定理？'))return;var t=mathTheorems.find(function(x){return x.id===id;});if(t&&t.imgId)deleteNoteImage(t.imgId);mathTheorems=mathTheorems.filter(function(x){return x.id!==id;});saveMathTheorems();renderNotes();toast('已删除');}
 function renderTheorems(){
   var subject=activeNoteSub||'math';
   var chapters=MATH_CHAPTERS[subject]||[{id:'other',name:'其他'}];
@@ -5159,9 +5197,12 @@ function renderTheorems(){
   h+='<input id="theorem-cond" placeholder="适用条件（选填）" style="margin-bottom:8px;width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--card-bg);color:var(--text);outline:none;">';
   h+='<textarea id="theorem-body" placeholder="结论/公式内容..." style="margin-bottom:8px;"></textarea>';
   h+='<textarea id="theorem-note" placeholder="备注/易错点（选填）..." style="min-height:40px;margin-bottom:8px;"></textarea>';
+  h+='<div class="mistake-drop-zone" id="theorem-drop-zone" style="border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;margin-bottom:10px;color:var(--text2);font-size:13px;">';
+  h+='📎 拖拽截图到这里，或点击选择<br><input type="file" id="theorem-img-input" accept="image/*" style="display:none"><span style="font-size:11px;opacity:0.7">支持 JPG / PNG / WEBP</span></div>';
+  h+='<img id="theorem-preview" class="ma-preview" style="display:none">';
   h+='<button id="theorem-add-btn" style="padding:7px 18px;border:none;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer;font-size:12px;font-weight:600;">添加</button></div>';
   if(filtered.length===0){h+='<div style="text-align:center;color:var(--text2);padding:20px 0;font-size:13px;">暂无自定义定理</div>';}
-  else{h+='<h4 style="font-size:13px;font-weight:600;margin:12px 0 8px;color:var(--text);">📝 我的定理</h4>';filtered.forEach(function(t){h+='<div class="theorem-card">';h+='<span class="theorem-del" data-thid="'+t.id+'">✕</span>';h+='<div class="theorem-name">'+esc(t.name)+'</div>';if(t.cond)h+='<div class="theorem-cond">条件: '+esc(t.cond)+'</div>';if(t.body)h+='<div class="theorem-body">'+esc(t.body)+'</div>';if(t.note)h+='<div class="theorem-note">💡 '+esc(t.note)+'</div>';h+='</div>';});}
+  else{h+='<h4 style="font-size:13px;font-weight:600;margin:12px 0 8px;color:var(--text);">📝 我的定理</h4>';filtered.forEach(function(t){h+='<div class="theorem-card">';h+='<span class="theorem-del" data-thid="'+t.id+'">✕</span>';h+='<div class="theorem-name">'+esc(t.name)+'</div>';if(t.imgId){h+='<img class="mistake-img" src="" data-imgid="'+t.imgId+'" style="display:none;max-width:100%;max-height:240px;border-radius:8px;margin:6px 0;cursor:pointer">';}if(t.cond)h+='<div class="theorem-cond">条件: '+esc(t.cond)+'</div>';if(t.body)h+='<div class="theorem-body">'+esc(t.body)+'</div>';if(t.note)h+='<div class="theorem-note">💡 '+esc(t.note)+'</div>';h+='</div>';});}
   return h;
 }
 function attachTheoremListeners(){
@@ -5170,6 +5211,23 @@ function attachTheoremListeners(){
   });
   var addBtn=document.getElementById('theorem-add-btn');
   if(addBtn)addBtn.addEventListener('click',addTheorem);
+  var imgInput=document.getElementById('theorem-img-input');
+  var dropZone=document.getElementById('theorem-drop-zone');
+  if(dropZone){
+    dropZone.addEventListener('click',function(){if(imgInput)imgInput.click();});
+    dropZone.addEventListener('dragover',function(e){e.preventDefault();e.stopPropagation();dropZone.style.borderColor='var(--accent)';dropZone.style.background='rgba(59,130,246,0.05)';});
+    dropZone.addEventListener('dragleave',function(e){e.preventDefault();dropZone.style.borderColor='var(--border)';dropZone.style.background='';});
+    dropZone.addEventListener('drop',function(e){e.preventDefault();e.stopPropagation();dropZone.style.borderColor='var(--border)';dropZone.style.background='';if(e.dataTransfer.files.length>0&&imgInput){imgInput.files=e.dataTransfer.files;var ev=new Event('change');imgInput.dispatchEvent(ev);}});
+  }
+  if(imgInput){
+    imgInput.addEventListener('change',function(){
+      if(this.files&&this.files[0]){var p=document.getElementById('theorem-preview');if(p){p.src=URL.createObjectURL(this.files[0]);p.style.display='block';}}
+    });
+  }
+  document.querySelectorAll('.theorem-card .mistake-img[data-imgid]').forEach(function(el){
+    el.addEventListener('click',function(){notesOpenViewerFromMistake(this.dataset.imgid);});
+    getNoteImage(el.dataset.imgid).then(function(img){if(img){el.src=URL.createObjectURL(new Blob([img.data]));el.style.display='block';}});
+  });
   document.querySelectorAll('.theorem-del[data-thid]').forEach(function(el){
     el.addEventListener('click',function(){delTheorem(this.dataset.thid);});
   });
