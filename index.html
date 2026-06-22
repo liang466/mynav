@@ -286,6 +286,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
 .ep-day-subject{font-size:12px;color:var(--text2);margin-bottom:4px;}
 .ep-day-subject input,.ep-day-subject textarea{width:100%;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg);color:var(--text);outline:none;font-family:inherit;resize:vertical;}
 .ep-day-subject textarea{min-height:36px;}
+.ep-task-check{width:14px;height:14px;border:2px solid var(--border);border-radius:50%;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:var(--tr);margin-top:2px;}
+.ep-task-check:hover{border-color:var(--accent);}
+.ep-task-check.done{background:var(--success);border-color:var(--success);}
+.ep-task-check.done::after{content:'✓';color:#fff;font-size:9px;font-weight:700;}
 .ep-sprint-list{max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
 .ep-sprint-day{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid transparent;transition:var(--tr);}
 .ep-sprint-day:hover{background:var(--card-bg);border-color:var(--border);}
@@ -3688,12 +3692,36 @@ function renderExamPrepPlan(){
   return h;
 }
 
+function epGetCycleTasks(phaseIdx,cycleIdx,dayIdx){
+  var key=phaseIdx+'_'+cycleIdx;
+  if(!examPrep.cycleData[key])examPrep.cycleData[key]={tasks:[{},{},{},{}]};
+  if(!examPrep.cycleData[key].tasks)examPrep.cycleData[key].tasks=[{},{},{},{}];
+  if(!examPrep.cycleData[key].tasks[dayIdx])examPrep.cycleData[key].tasks[dayIdx]={};
+  return examPrep.cycleData[key].tasks[dayIdx];
+}
+function epAddTask(phaseIdx,cycleIdx,dayIdx,text){
+  var dayTasks=epGetCycleTasks(phaseIdx,cycleIdx,dayIdx);
+  dayTasks.items=dayTasks.items||[];
+  dayTasks.items.push({id:'et_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),text:text,done:false});
+  saveExamPrep();renderProjectTracker();
+}
+function epToggleTask(phaseIdx,cycleIdx,dayIdx,taskId){
+  var dayTasks=epGetCycleTasks(phaseIdx,cycleIdx,dayIdx);
+  if(!dayTasks.items)return;
+  var t=dayTasks.items.find(function(x){return x.id===taskId;});
+  if(t){t.done=!t.done;saveExamPrep();renderProjectTracker();}
+}
+function epDelTask(phaseIdx,cycleIdx,dayIdx,taskId){
+  var dayTasks=epGetCycleTasks(phaseIdx,cycleIdx,dayIdx);
+  if(!dayTasks.items)return;
+  dayTasks.items=dayTasks.items.filter(function(x){return x.id!==taskId;});
+  saveExamPrep();renderProjectTracker();
+}
+
 function renderPhaseDetail(phaseIdx,phase,curCycle,curDay,today){
   var h='<div class="ep-detail-header">'+phase.icon+' '+phase.name+' · '+phase.desc+'</div>';
   if(phase.cycles>0){
-    // Cycle-based phases (基础期 & 强化期)
     var viewCycle=epCurrentCycle[phaseIdx]!==undefined?epCurrentCycle[phaseIdx]:curCycle;
-    if(phaseIdx===curPhase)viewCycle=epCurrentCycle[phaseIdx]!==undefined?epCurrentCycle[phaseIdx]:curCycle;
     // Cycle navigation
     h+='<div class="ep-cycle-nav">';
     for(var c=0;c<phase.cycles;c++){
@@ -3707,23 +3735,39 @@ function renderPhaseDetail(phaseIdx,phase,curCycle,curDay,today){
     h+='<div class="ep-cycle-info">第 '+(viewCycle+1)+' / '+phase.cycles+' 循环 · '+cycleStart+' ~ '+cycleEnd;
     if(viewCycle===curCycle&&phaseIdx===curPhase)h+=' <span style="color:var(--accent);font-weight:600;">← 当前</span>';
     h+='</div>';
-    // 4-day cards
-    h+='<div class="ep-days">';
+    // 4-day task sections
     var themes=examPrep.cycleTemplate.dayThemes;
     var dayIcons=['🎬','✏️','📝','📋'];
+    h+='<div class="ep-days">';
     for(var d=0;d<4;d++){
       var dayDate=addDays(cycleStart,d);
       var isToday=dayDate===today;
-      var subjects=epGetCycleSubjects(phaseIdx,viewCycle,d);
+      var dayTasks=epGetCycleTasks(phaseIdx,viewCycle,d);
+      var items=dayTasks.items||[];
+      var doneCount=items.filter(function(x){return x.done;}).length;
       h+='<div class="ep-day" style="'+(isToday?'border-color:var(--accent);box-shadow:0 0 0 2px rgba(67,97,246,0.15);':'')+'">';
-      h+='<div class="ep-day-theme">'+dayIcons[d]+' <input data-ep-theme="'+d+'" value="'+esc(themes[d])+'" title="编辑主题名"></div>';
-      h+='<div style="font-size:10px;color:var(--text2);margin-bottom:6px;">'+dayDate+(isToday?' (今天)':'')+'</div>';
-      subjects.forEach(function(subj,si){
-        h+='<div class="ep-day-subject"><input data-ep-subj="'+phaseIdx+'_'+viewCycle+'_'+d+'_'+si+'" value="'+esc(subj)+'" placeholder="科目/内容"></div>';
-      });
-      if(subjects.length<4){
-        h+='<div class="ep-day-subject"><input data-ep-addsubj="'+phaseIdx+'_'+viewCycle+'_'+d+'" placeholder="+ 添加科目" style="border-style:dashed;opacity:0.6;"></div>';
+      h+='<div class="ep-day-theme">'+dayIcons[d]+' <input data-ep-theme="'+d+'" value="'+esc(themes[d])+'" title="编辑主题名" style="width:60px;"></div>';
+      h+='<div style="font-size:10px;color:var(--text2);margin-bottom:6px;">'+dayDate+(isToday?' (今天)':'');
+      if(items.length>0)h+=' · '+doneCount+'/'+items.length;
+      h+='</div>';
+      // Task list
+      if(items.length>0){
+        h+='<div style="max-height:160px;overflow-y:auto;">';
+        items.forEach(function(task,ti){
+          h+='<div style="display:flex;align-items:flex-start;gap:4px;padding:3px 0;font-size:12px;">';
+          h+='<div class="ep-task-check'+(task.done?' done':'')+'" data-ep-tcheck="'+phaseIdx+'_'+viewCycle+'_'+d+'_'+task.id+'"></div>';
+          h+='<span style="flex:1;'+(task.done?'text-decoration:line-through;color:var(--text2);':'color:var(--text);')+'">'+esc(task.text)+'</span>';
+          h+='<span style="cursor:pointer;font-size:10px;color:var(--text2);opacity:0.5;" data-ep-tdel="'+phaseIdx+'_'+viewCycle+'_'+d+'_'+task.id+'">✕</span>';
+          h+='</div>';
+        });
+        h+='</div>';
+      }else{
+        h+='<div style="font-size:11px;color:var(--text2);padding:6px 0;opacity:0.6;">暂无任务</div>';
       }
+      // Add task input
+      h+='<div style="display:flex;gap:4px;margin-top:6px;">';
+      h+='<input data-ep-tadd="'+phaseIdx+'_'+viewCycle+'_'+d+'" placeholder="添加任务..." style="flex:1;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:11px;background:var(--bg);color:var(--text);outline:none;">';
+      h+='</div>';
       h+='</div>';
     }
     h+='</div>';
@@ -3733,7 +3777,6 @@ function renderPhaseDetail(phaseIdx,phase,curCycle,curDay,today){
     for(var d=0;d<phase.days;d++){
       var dayDate=addDays(phase.startDate,d);
       var isToday=dayDate===today;
-      var isPast=dayDate<today;
       var dayData=epGetSprintDay(dayDate);
       var dayOfWeek=['日','一','二','三','四','五','六'][new Date(dayDate).getDay()];
       h+='<div class="ep-sprint-day'+(isToday?' today':'')+'">';
@@ -3772,27 +3815,27 @@ function attachExamPrepListeners(){
       saveExamPrep();
     });
   });
-  // Day subject editing
-  document.querySelectorAll('[data-ep-subj]').forEach(function(el){
-    el.addEventListener('change',function(){
-      var parts=this.dataset.epSubj.split('_');
-      var pi=parseInt(parts[0]),ci=parseInt(parts[1]),di=parseInt(parts[2]),si=parseInt(parts[3]);
-      var subjects=epGetCycleSubjects(pi,ci,di);
-      subjects[si]=this.value;
-      epSetCycleSubjects(pi,ci,di,subjects);
-    });
-  });
-  // Add subject to a day
-  document.querySelectorAll('[data-ep-addsubj]').forEach(function(el){
+  // Task add (Enter key)
+  document.querySelectorAll('[data-ep-tadd]').forEach(function(el){
     el.addEventListener('keydown',function(e){
       if(e.key==='Enter'&&this.value.trim()){
-        var parts=this.dataset.epAddsubj.split('_');
-        var pi=parseInt(parts[0]),ci=parseInt(parts[1]),di=parseInt(parts[2]);
-        var subjects=epGetCycleSubjects(pi,ci,di);
-        subjects.push(this.value.trim());
-        epSetCycleSubjects(pi,ci,di,subjects);
-        renderProjectTracker();
+        var parts=this.dataset.epTadd.split('_');
+        epAddTask(parseInt(parts[0]),parseInt(parts[1]),parseInt(parts[2]),this.value.trim());
       }
+    });
+  });
+  // Task check toggle
+  document.querySelectorAll('[data-ep-tcheck]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var parts=this.dataset.epTcheck.split('_');
+      epToggleTask(parseInt(parts[0]),parseInt(parts[1]),parseInt(parts[2]),parts[3]+'_'+parts[4]);
+    });
+  });
+  // Task delete
+  document.querySelectorAll('[data-ep-tdel]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var parts=this.dataset.epTdel.split('_');
+      epDelTask(parseInt(parts[0]),parseInt(parts[1]),parseInt(parts[2]),parts[3]+'_'+parts[4]);
     });
   });
   // Sprint day check toggle
