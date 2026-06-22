@@ -250,6 +250,55 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
 @media(max-width:600px){.pt-detail-panel{width:100%;}}
 @media(max-width:900px){.pt-stats{gap:10px;}}
 @media(max-width:700px){.pt-header{flex-direction:column;align-items:flex-start;}.pt-actions{margin-left:0;}}
+/* ===== Exam Prep Plan (考研备战计划) ===== */
+.ep-plan{background:var(--card-bg);border-radius:12px;padding:18px;border:1px solid var(--border);margin-bottom:14px;}
+.ep-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap;}
+.ep-title{font-size:16px;font-weight:700;color:var(--text);}
+.ep-subtitle{font-size:12px;color:var(--text2);}
+.ep-phases{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.ep-phase{border-radius:10px;padding:14px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:var(--tr);position:relative;}
+.ep-phase:hover{border-color:var(--accent);}
+.ep-phase.current{border-color:var(--accent);box-shadow:0 0 0 2px rgba(67,97,238,0.15);}
+.ep-phase.done{opacity:0.65;}
+.ep-phase-icon{font-size:20px;margin-bottom:6px;}
+.ep-phase-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.ep-phase-info{font-size:11px;color:var(--text2);line-height:1.6;}
+.ep-phase-badge{position:absolute;top:8px;right:8px;font-size:10px;padding:2px 8px;border-radius:6px;font-weight:600;}
+.ep-phase-badge.current{background:var(--accent);color:#fff;}
+.ep-phase-badge.done{background:var(--success);color:#fff;}
+.ep-phase-badge.upcoming{background:var(--border);color:var(--text2);}
+.ep-progress{margin-bottom:14px;}
+.ep-progress-header{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);margin-bottom:4px;}
+.ep-progress-bar{height:8px;background:var(--border);border-radius:4px;overflow:hidden;display:flex;}
+.ep-progress-seg{height:100%;transition:width .4s ease;}
+.ep-detail{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:14px;display:none;}
+.ep-detail.show{display:block;}
+.ep-detail-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:14px;font-weight:600;color:var(--text);}
+.ep-cycle-nav{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;}
+.ep-cycle-btn{padding:4px 10px;border:1px solid var(--border);border-radius:8px;background:var(--card-bg);cursor:pointer;font-size:11px;color:var(--text2);transition:var(--tr);}
+.ep-cycle-btn:hover{border-color:var(--accent);color:var(--accent);}
+.ep-cycle-btn.current{background:var(--accent);color:#fff;border-color:var(--accent);}
+.ep-cycle-info{font-size:12px;color:var(--text2);margin-bottom:10px;}
+.ep-days{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+.ep-day{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:12px;}
+.ep-day-theme{font-size:12px;font-weight:600;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:4px;}
+.ep-day-theme input{border:none;background:transparent;font-size:12px;font-weight:600;color:var(--accent);outline:none;width:60px;}
+.ep-day-subject{font-size:12px;color:var(--text2);margin-bottom:4px;}
+.ep-day-subject input,.ep-day-subject textarea{width:100%;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--bg);color:var(--text);outline:none;font-family:inherit;resize:vertical;}
+.ep-day-subject textarea{min-height:36px;}
+.ep-sprint-list{max-height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
+.ep-sprint-day{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border-radius:8px;border:1px solid transparent;transition:var(--tr);}
+.ep-sprint-day:hover{background:var(--card-bg);border-color:var(--border);}
+.ep-sprint-day.today{border-left:3px solid var(--accent);background:rgba(67,97,246,0.04);}
+.ep-sprint-check{width:18px;height:18px;border:2px solid var(--border);border-radius:50%;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:2px;transition:var(--tr);}
+.ep-sprint-check:hover{border-color:var(--accent);}
+.ep-sprint-check.done{background:var(--success);border-color:var(--success);}
+.ep-sprint-check.done::after{content:'✓';color:#fff;font-size:11px;font-weight:700;}
+.ep-sprint-info{flex:1;min-width:0;}
+.ep-sprint-date{font-size:11px;font-weight:600;color:var(--text);margin-bottom:2px;}
+.ep-sprint-note{font-size:12px;color:var(--text2);}
+.ep-sprint-note textarea{width:100%;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:transparent;color:var(--text);outline:none;font-family:inherit;resize:vertical;min-height:28px;}
+@media(max-width:600px){.ep-phases{grid-template-columns:1fr;}.ep-days{grid-template-columns:repeat(2,1fr);}}
 /* ===== Category Pages ===== */
 .cat-toolbar{display:flex;gap:8px;margin-bottom:18px;align-items:center;flex-wrap:wrap;}
 .cat-search{flex:1;min-width:200px;padding:10px 16px;border:1px solid var(--border);border-radius:10px;font-size:14px;background:var(--card-bg);color:var(--text);outline:none;transition:var(--tr);}
@@ -831,16 +880,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",s
     </div>
   </div>
 
-  <!-- Timeline Section -->
-  <div class="home-card" style="margin-bottom:18px;">
-    <div class="hc-title">📋 四天循环计划 <span class="hc-collapse-btn" onclick="toggleHomeCollapse('home-timeline-body',this)">▾</span></div>
-    <div class="hc-body" id="home-timeline-body">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-        <div class="timeline-nav" id="cycle-nav"></div>
-      </div>
-      <div class="timeline-grid" id="timeline-grid"></div>
-    </div>
-  </div>
 
   <!-- Project Tracker Section -->
   <div class="home-card pt-section" style="margin-bottom:18px;">
@@ -3479,8 +3518,6 @@ function renderHomeBoards(){
   renderTodos();
   renderExpr();
   renderHomeStats();
-  ensureCurrentRound();
-  renderTimeline();
   renderProjectTracker();
   renderMilestones();
   renderDiaryLayout();
@@ -3529,14 +3566,267 @@ let ptCurrentWeek = {};
 
 function saveProjects(){ saveStore('myNavProjects', projects); }
 
+// ====== Exam Prep Plan (考研备战计划) ======
+var epExpandedPhase = null;
+var epCurrentCycle = {0:0, 1:0};
+function initExamPrep(){
+  var saved=loadStore('myNavExamPrep',null);
+  if(saved)return saved;
+  var today=new Date();today.setHours(0,0,0,0);
+  var examDate=addDays(today.toISOString().slice(0,10),181);
+  var p3Start=addDays(examDate,-42);
+  var p2Start=addDays(p3Start,-84);
+  var data={
+    examDate:examDate,
+    phases:[
+      {name:'基础期',icon:'📚',desc:'过完数学、英语、专业课基础',startDate:today.toISOString().slice(0,10),endDate:addDays(p2Start,-1),days:56,cycles:14},
+      {name:'强化期',icon:'💪',desc:'做卷子为主，看课本视频为辅',startDate:p2Start,endDate:addDays(p3Start,-1),days:84,cycles:21},
+      {name:'决战期',icon:'🎯',desc:'42天解决薄弱点',startDate:p3Start,endDate:examDate,days:42,cycles:0}
+    ],
+    cycleTemplate:{dayThemes:['视频课','刷题课','试卷天','总结天'],days:[{subjects:['数学','英语','专业课']},{subjects:['数学','英语','专业课']},{subjects:['数学','英语','专业课']},{subjects:['回顾','笔记整理','查漏补缺']}]},
+    cycleData:{},
+    sprintDays:{}
+  };
+  saveStore('myNavExamPrep',data);
+  return data;
+}
+var examPrep=initExamPrep();
+function saveExamPrep(){saveStore('myNavExamPrep',examPrep);}
+function epGetCurrentPhaseIdx(){
+  var today=new Date().toISOString().slice(0,10);
+  for(var i=0;i<examPrep.phases.length;i++){if(today>=examPrep.phases[i].startDate&&today<=examPrep.phases[i].endDate)return i;}
+  return examPrep.phases.length-1;
+}
+function epGetCycleIdx(phaseIdx){
+  var phase=examPrep.phases[phaseIdx];if(!phase||phase.cycles<=0)return 0;
+  var today=new Date();today.setHours(0,0,0,0);
+  var start=new Date(phase.startDate);start.setHours(0,0,0,0);
+  var days=Math.floor((today-start)/86400000);
+  return Math.max(0,Math.min(Math.floor(days/4),phase.cycles-1));
+}
+function epGetDayInCycle(phaseIdx,cycleIdx){
+  var phase=examPrep.phases[phaseIdx];if(!phase||phase.cycles<=0)return 0;
+  var today=new Date();today.setHours(0,0,0,0);
+  var start=new Date(phase.startDate);start.setHours(0,0,0,0);
+  var days=Math.floor((today-start)/86400000);
+  return Math.max(0,Math.min(days%4,3));
+}
+function epGetProgress(){
+  var today=new Date();today.setHours(0,0,0,0);
+  var start=new Date(examPrep.phases[0].startDate);start.setHours(0,0,0,0);
+  var end=new Date(examPrep.examDate);end.setHours(0,0,0,0);
+  var total=Math.ceil((end-start)/86400000);
+  var elapsed=Math.floor((today-start)/86400000);
+  return{total:total,elapsed:Math.max(0,elapsed),pct:Math.min(100,Math.max(0,Math.round(elapsed/total*100)))};
+}
+function epGetCycleKey(phaseIdx,cycleIdx){return phaseIdx+'_'+cycleIdx;}
+function epGetCycleSubjects(phaseIdx,cycleIdx,dayIdx){
+  var key=epGetCycleKey(phaseIdx,cycleIdx);
+  if(examPrep.cycleData[key]&&examPrep.cycleData[key][dayIdx])return examPrep.cycleData[key][dayIdx];
+  return examPrep.cycleTemplate.days[dayIdx]?examPrep.cycleTemplate.days[dayIdx].subjects:[];
+}
+function epSetCycleSubjects(phaseIdx,cycleIdx,dayIdx,subjects){
+  var key=epGetCycleKey(phaseIdx,cycleIdx);
+  if(!examPrep.cycleData[key])examPrep.cycleData[key]={};
+  examPrep.cycleData[key][dayIdx]=subjects;
+  saveExamPrep();
+}
+function epGetSprintDay(dateStr){return examPrep.sprintDays[dateStr]||{done:false,note:''};}
+function epSetSprintDay(dateStr,data){examPrep.sprintDays[dateStr]=data;saveExamPrep();}
+
+function renderExamPrepPlan(){
+  var curPhase=epGetCurrentPhaseIdx();
+  var curCycle=epGetCycleIdx(curPhase);
+  var curDay=epGetDayInCycle(curPhase,curCycle);
+  var progress=epGetProgress();
+  var today=new Date().toISOString().slice(0,10);
+  var h='<div class="ep-plan">';
+  h+='<div class="ep-header"><span class="ep-title">🎓 考研备战计划</span>';
+  h+='<span class="ep-subtitle">距离考研 '+Math.max(0,progress.total-progress.elapsed)+' 天 · 总进度 '+progress.pct+'%</span></div>';
+  // Phase overview cards
+  h+='<div class="ep-phases">';
+  examPrep.phases.forEach(function(phase,pi){
+    var isCurrent=pi===curPhase;
+    var isDone=today>phase.endDate;
+    var phaseDays=Math.ceil((new Date(phase.endDate)-new Date(phase.startDate))/86400000)+1;
+    var elapsed=isDone?phaseDays:Math.max(0,Math.ceil((new Date(today)-new Date(phase.startDate))/86400000)+1);
+    var pct=isDone?100:Math.min(100,Math.round(elapsed/phaseDays*100));
+    var badge=isDone?'已完成':isCurrent?'进行中':'未开始';
+    var cls='ep-phase'+(isCurrent?' current':'')+(isDone?' done':'');
+    h+='<div class="'+cls+'" data-ep-expand="'+pi+'">';
+    h+='<span class="ep-phase-badge '+(isDone?'done':isCurrent?'current':'upcoming')+'">'+badge+'</span>';
+    h+='<div class="ep-phase-icon">'+phase.icon+'</div>';
+    h+='<div class="ep-phase-name">'+phase.name+'</div>';
+    h+='<div class="ep-phase-info">';
+    h+=phase.cycles>0?phase.cycles+'个循环 · '+phase.days+'天':phase.days+'天 · 按天管理';
+    h+='<br>'+pct+'% · '+Math.max(0,phaseDays-Math.min(elapsed,phaseDays))+'天剩余';
+    h+='</div></div>';
+  });
+  h+='</div>';
+  // Overall progress bar with 3 segments
+  h+='<div class="ep-progress"><div class="ep-progress-header"><span>总体进度</span><span>'+progress.elapsed+'/'+progress.total+'天 ('+progress.pct+'%)</span></div>';
+  h+='<div class="ep-progress-bar">';
+  examPrep.phases.forEach(function(phase,pi){
+    var phaseDays=phase.days;
+    var phaseElapsed=0;
+    if(today>phase.endDate)phaseElapsed=phaseDays;
+    else if(today>=phase.startDate){phaseElapsed=Math.max(0,Math.ceil((new Date(today)-new Date(phase.startDate))/86400000)+1);}
+    var segPct=Math.min(100,Math.round(phaseElapsed/phaseDays*100));
+    var segWidth=(phaseDays/progress.total*100).toFixed(1);
+    var colors=['#3b82f6','#8b5cf6','#ef4444'];
+    h+='<div class="ep-progress-seg" style="width:'+segWidth+'%;background:'+colors[pi]+';opacity:'+(today>phase.endDate?'0.5':segPct>0?'1':'0.2')+'"></div>';
+  });
+  h+='</div></div>';
+  // Expanded phase detail
+  h+='<div class="ep-detail'+(epExpandedPhase!==null?' show':'')+'" id="ep-detail-area">';
+  if(epExpandedPhase!==null){
+    var phase=examPrep.phases[epExpandedPhase];
+    h+=renderPhaseDetail(epExpandedPhase,phase,curCycle,curDay,today);
+  }
+  h+='</div>';
+  h+='</div>';
+  return h;
+}
+
+function renderPhaseDetail(phaseIdx,phase,curCycle,curDay,today){
+  var h='<div class="ep-detail-header">'+phase.icon+' '+phase.name+' · '+phase.desc+'</div>';
+  if(phase.cycles>0){
+    // Cycle-based phases (基础期 & 强化期)
+    var viewCycle=epCurrentCycle[phaseIdx]!==undefined?epCurrentCycle[phaseIdx]:curCycle;
+    if(phaseIdx===curPhase)viewCycle=epCurrentCycle[phaseIdx]!==undefined?epCurrentCycle[phaseIdx]:curCycle;
+    // Cycle navigation
+    h+='<div class="ep-cycle-nav">';
+    for(var c=0;c<phase.cycles;c++){
+      var cStart=addDays(phase.startDate,c*4);
+      var cEnd=addDays(phase.startDate,c*4+3);
+      h+='<button class="ep-cycle-btn'+(c===viewCycle?' current':'')+'" data-ep-cycle="'+c+'" title="'+cStart+' ~ '+cEnd+'">第'+(c+1)+'循环</button>';
+    }
+    h+='</div>';
+    var cycleStart=addDays(phase.startDate,viewCycle*4);
+    var cycleEnd=addDays(phase.startDate,viewCycle*4+3);
+    h+='<div class="ep-cycle-info">第 '+(viewCycle+1)+' / '+phase.cycles+' 循环 · '+cycleStart+' ~ '+cycleEnd;
+    if(viewCycle===curCycle&&phaseIdx===curPhase)h+=' <span style="color:var(--accent);font-weight:600;">← 当前</span>';
+    h+='</div>';
+    // 4-day cards
+    h+='<div class="ep-days">';
+    var themes=examPrep.cycleTemplate.dayThemes;
+    var dayIcons=['🎬','✏️','📝','📋'];
+    for(var d=0;d<4;d++){
+      var dayDate=addDays(cycleStart,d);
+      var isToday=dayDate===today;
+      var subjects=epGetCycleSubjects(phaseIdx,viewCycle,d);
+      h+='<div class="ep-day" style="'+(isToday?'border-color:var(--accent);box-shadow:0 0 0 2px rgba(67,97,246,0.15);':'')+'">';
+      h+='<div class="ep-day-theme">'+dayIcons[d]+' <input data-ep-theme="'+d+'" value="'+esc(themes[d])+'" title="编辑主题名"></div>';
+      h+='<div style="font-size:10px;color:var(--text2);margin-bottom:6px;">'+dayDate+(isToday?' (今天)':'')+'</div>';
+      subjects.forEach(function(subj,si){
+        h+='<div class="ep-day-subject"><input data-ep-subj="'+phaseIdx+'_'+viewCycle+'_'+d+'_'+si+'" value="'+esc(subj)+'" placeholder="科目/内容"></div>';
+      });
+      if(subjects.length<4){
+        h+='<div class="ep-day-subject"><input data-ep-addsubj="'+phaseIdx+'_'+viewCycle+'_'+d+'" placeholder="+ 添加科目" style="border-style:dashed;opacity:0.6;"></div>';
+      }
+      h+='</div>';
+    }
+    h+='</div>';
+  }else{
+    // Sprint phase: day-by-day management
+    h+='<div class="ep-sprint-list">';
+    for(var d=0;d<phase.days;d++){
+      var dayDate=addDays(phase.startDate,d);
+      var isToday=dayDate===today;
+      var isPast=dayDate<today;
+      var dayData=epGetSprintDay(dayDate);
+      var dayOfWeek=['日','一','二','三','四','五','六'][new Date(dayDate).getDay()];
+      h+='<div class="ep-sprint-day'+(isToday?' today':'')+'">';
+      h+='<div class="ep-sprint-check'+(dayData.done?' done':'')+'" data-ep-sprint-check="'+dayDate+'"></div>';
+      h+='<div class="ep-sprint-info">';
+      h+='<div class="ep-sprint-date">Day '+(d+1)+' · '+dayDate+' 周'+dayOfWeek+(isToday?' (今天)':'')+'</div>';
+      h+='<div class="ep-sprint-note"><textarea data-ep-sprint-note="'+dayDate+'" placeholder="今日任务/薄弱点..." rows="1">'+(dayData.note?esc(dayData.note):'')+'</textarea></div>';
+      h+='</div></div>';
+    }
+    h+='</div>';
+  }
+  return h;
+}
+
+function attachExamPrepListeners(){
+  // Phase expand/collapse
+  document.querySelectorAll('[data-ep-expand]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var pi=parseInt(this.dataset.epExpand);
+      epExpandedPhase=epExpandedPhase===pi?null:pi;
+      renderProjectTracker();
+    });
+  });
+  // Cycle navigation
+  document.querySelectorAll('[data-ep-cycle]').forEach(function(el){
+    el.addEventListener('click',function(){
+      epCurrentCycle[epExpandedPhase]=parseInt(this.dataset.epCycle);
+      renderProjectTracker();
+    });
+  });
+  // Day theme editing
+  document.querySelectorAll('[data-ep-theme]').forEach(function(el){
+    el.addEventListener('change',function(){
+      var di=parseInt(this.dataset.epTheme);
+      examPrep.cycleTemplate.dayThemes[di]=this.value;
+      saveExamPrep();
+    });
+  });
+  // Day subject editing
+  document.querySelectorAll('[data-ep-subj]').forEach(function(el){
+    el.addEventListener('change',function(){
+      var parts=this.dataset.epSubj.split('_');
+      var pi=parseInt(parts[0]),ci=parseInt(parts[1]),di=parseInt(parts[2]),si=parseInt(parts[3]);
+      var subjects=epGetCycleSubjects(pi,ci,di);
+      subjects[si]=this.value;
+      epSetCycleSubjects(pi,ci,di,subjects);
+    });
+  });
+  // Add subject to a day
+  document.querySelectorAll('[data-ep-addsubj]').forEach(function(el){
+    el.addEventListener('keydown',function(e){
+      if(e.key==='Enter'&&this.value.trim()){
+        var parts=this.dataset.epAddsubj.split('_');
+        var pi=parseInt(parts[0]),ci=parseInt(parts[1]),di=parseInt(parts[2]);
+        var subjects=epGetCycleSubjects(pi,ci,di);
+        subjects.push(this.value.trim());
+        epSetCycleSubjects(pi,ci,di,subjects);
+        renderProjectTracker();
+      }
+    });
+  });
+  // Sprint day check toggle
+  document.querySelectorAll('[data-ep-sprint-check]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var dateStr=this.dataset.epSprintCheck;
+      var data=epGetSprintDay(dateStr);
+      data.done=!data.done;
+      epSetSprintDay(dateStr,data);
+      renderProjectTracker();
+    });
+  });
+  // Sprint day note editing
+  document.querySelectorAll('[data-ep-sprint-note]').forEach(function(el){
+    el.addEventListener('change',function(){
+      var dateStr=this.dataset.epSprintNote;
+      var data=epGetSprintDay(dateStr);
+      data.note=this.value;
+      epSetSprintDay(dateStr,data);
+    });
+  });
+}
+
 function renderProjectTracker(){
   const el = document.getElementById('project-tracker-area');
   if(!el) return;
+  // Render exam prep plan first
+  let html = renderExamPrepPlan();
   if(!projects.length){
-    el.innerHTML = `<div class="pt-empty"><div class="pt-empty-icon">🚀</div><div class="pt-empty-text">还没有项目，创建你的第一个项目计划吧</div><button class="pt-create-btn" onclick="openProjectModal()">+ 创建项目</button></div>`;
+    html += `<div style="text-align:center;margin-top:12px;"><button class="pt-create-btn" onclick="openProjectModal()">+ 新建项目</button>${!projects.find(p=>p.id==='sprint300')?'<button class="pt-init-btn" onclick="initSprintPlan()">🏃 导入300天训练计划</button>':''}</div>`;
+    el.innerHTML = html;
+    attachExamPrepListeners();
     return;
   }
-  let html = '';
   projects.forEach((proj, pi) => {
     const allTasks = proj.weeks.flatMap(w=>w.tasks);
     const doneAll = allTasks.filter(t=>t.done).length;
@@ -3584,6 +3874,7 @@ function renderProjectTracker(){
   });
   html += `<div style="text-align:center;margin-top:12px;"><button class="pt-create-btn" onclick="openProjectModal()">+ 新建项目</button>${!projects.find(p=>p.id==='sprint300')?'<button class="pt-init-btn" onclick="initSprintPlan()">🏃 导入300天训练计划</button>':''}</div>`;
   el.innerHTML = html;
+  attachExamPrepListeners();
 }
 
 function getCurrentWeekIdx(proj){
