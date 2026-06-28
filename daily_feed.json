@@ -1,71 +1,71 @@
 {
-  "timestamp": 1750521600000,
-  "date": "2026-06-21",
+  "timestamp": 1782608354029,
+  "date": "2026-06-28",
   "target": "华南理工 控制工程",
   "items": [
     {
       "subject": "math",
-      "title": "武忠祥每日一题：累次积分交换次序（第329题）",
-      "source": "武忠祥老师/B站每日一题",
-      "date": "2026-06-21",
-      "content": "【题目】计算累次积分 I = ∫₀¹ dx ∫ₓ¹ e^(-y²) dy。\n\n【解题思路】内层积分 ∫ₓ¹ e^(-y²) dy 无法求出初等原函数，因此必须交换积分次序。\n\n【解题步骤】\n第一步：画积分区域 D：0 ≤ x ≤ 1, x ≤ y ≤ 1（由 y=x, y=1, x=0 围成的三角形区域）。\n第二步：交换积分次序，将 D 重新描述为 0 ≤ y ≤ 1, 0 ≤ x ≤ y。\n第三步：I = ∫₀¹ dy ∫₀ʸ e^(-y²) dx = ∫₀¹ [x·e^(-y²)]₀ʸ dy = ∫₀¹ y·e^(-y²) dy\n第四步：令 t = y², dt = 2y·dy\nI = (1/2)∫₀¹ e^(-t) dt = (1/2)[-e^(-t)]₀¹ = (1/2)(1 - e⁻¹)\n\n【答案】I = (1/2)(1 - 1/e)\n\n【核心技巧】\n1. 遇到内层被积函数无法求原函数 → 优先考虑交换积分次序\n2. 画积分区域图是交换次序的前提\n3. 常见不可积函数：e^(-x²), sin(x)/x, cos(x²) 等\n\n【同类练习】计算 ∫₀¹ dy ∫ᵧ¹ (sin x)/x dx，提示：交换次序后变为 ∫₀¹ sin(x) dx = 1 - cos(1)。",
-      "link": "https://www.bilibili.com/video/BV1LKn2ztEE5/"
+      "title": "武忠祥每日一题：极限求法综合（泰勒展开法）",
+      "source": "武忠祥/考研工具站",
+      "date": "2026-06-28",
+      "content": "【题目】求极限 lim(x→0) (eˣ - sin x - 1) / x²\n\n【解题思路】\n第一步：识别题型——代入x=0得 (1 - 0 - 1)/0 = 0/0型未定式\n第二步：选择最优解法——泰勒展开比洛必达更快捷\n第三步：展开过程\n  eˣ = 1 + x + x²/2 + o(x²)\n  sin x = x - x³/6 + o(x³)\n  分子 = (1 + x + x²/2) - (x) - 1 + o(x²) = x²/2 + o(x²)\n第四步：lim = (x²/2) / x² = 1/2\n\n【答案】1/2\n\n【关键泰勒公式速记】\n· sin x = x - x³/6 + x⁵/120 + …\n· eˣ = 1 + x + x²/2! + x³/3! + …\n· cos x = 1 - x²/2 + x⁴/24 - …\n· ln(1+x) = x - x²/2 + x³/3 - …\n\n【核心技巧】当分子含eˣ、sinx、cosx等函数混合时，优先使用泰勒展开到与分母同阶的项。等价无穷小替换只能替换乘除因子，不能替换加减项。",
+      "link": "https://www.kaoyantools.com/26allnotes/26sxnote/24218.html"
     },
     {
       "subject": "math",
-      "title": "张宇高数18讲精选题：极限求法综合（泰勒公式+等价无穷小）",
-      "source": "张宇/考研数学高数18讲",
-      "date": "2026-06-21",
-      "content": "【题目】求极限 lim(x→0) [x - sin(x)] / [x²·(eˣ - 1)]。\n\n【知识点】等价无穷小替换、泰勒展开、洛必达法则。\n\n【解题步骤】\n第一步：判断类型 → 0/0 型未定式。\n第二步：泰勒展开（核心方法）\n  分子：sin(x) = x - x³/6 + o(x³) → x - sin(x) = x³/6 + o(x³)\n  分母：eˣ - 1 = x + x²/2 + o(x²) → x²·(eˣ - 1) = x³ + x⁴/2 + o(x⁴)\n第三步：lim = (x³/6 + o(x³)) / (x³ + o(x³)) = 1/6\n\n【答案】1/6\n\n【关键泰勒公式速记】\n· sin(x) ~ x - x³/6 + x⁵/120\n· eˣ - 1 ~ x + x²/2 + x³/6\n· 1 - cos(x) ~ x²/2 - x⁴/24\n· ln(1+x) ~ x - x²/2 + x³/3\n· (1+x)^α ~ 1 + αx + α(α-1)x²/2\n\n【张宇口诀】\"分母几阶，分子至少展到几阶；等价无穷小只换因子不换加减\"\n\n【易错提醒】等价无穷小替换只能替换乘除因子，不能替换加减项中的部分！如 x - sin(x) 不能将 sin(x) 直接替换为 x。",
-      "link": "https://baijiahao.baidu.com/s?id=1771113786944271738"
+      "title": "每日一题：多元函数全微分与链式求导综合",
+      "source": "考研数学每日一题/UC视频",
+      "date": "2026-06-28",
+      "content": "【题目】设 z = f(x²+y², xy)，其中f具有二阶连续偏导数，求 ∂²z/∂x∂y。\n\n【解题步骤】\n令 u = x²+y²，v = xy\n\n第一步：求 ∂z/∂x\n  ∂z/∂x = f₁'·(2x) + f₂'·y = 2x·f₁' + y·f₂'\n\n第二步：求 ∂²z/∂x∂y = ∂(∂z/∂x)/∂y\n  = ∂/∂y [2x·f₁'(u,v) + y·f₂'(u,v)]\n  = 2x[f₁₁''·(2y) + f₁₂''·x] + f₂' + y[f₂₁''·(2y) + f₂₂''·x]\n  = 4xy·f₁₁'' + (2x²+2y²)·f₁₂'' + xy·f₂₂'' + f₂'\n\n【答案】∂²z/∂x∂y = 4xy·f₁₁'' + 2(x²+y²)·f₁₂'' + xy·f₂₂'' + f₂'\n\n【考点提醒】\n① 链式法则求复合函数偏导数，注意中间变量u,v对x,y的偏导\n② f₁₂'' = f₂₁''（二阶连续偏导条件下混合偏导相等）\n③ 别遗漏乘积求导法则中的f₂'项（y·f₂'对y求导 = f₂' + y·∂f₂'/∂y）\n④ 此题型在考研数学中属于高频考点，建议做3-5道同类题巩固。",
+      "link": "https://mparticle.uc.cn/video.html?sm_article_id=10331954268995392947"
     },
     {
       "subject": "math",
-      "title": "李永乐线代经典题：实对称矩阵特征值与对角化综合",
-      "source": "李永乐/线性代数辅导讲义",
-      "date": "2026-06-21",
-      "content": "【题目】设 A 为3阶实对称矩阵，已知特征值 λ₁=1, λ₂=2, λ₃=-1，对应特征向量 α₁=(1,1,0)ᵀ, α₂=(1,-1,1)ᵀ。\n求：(1) 属于 λ₃=-1 的特征向量 α₃；(2) 矩阵 A。\n\n【解题步骤】\n(1) 利用实对称矩阵性质：不同特征值的特征向量必正交。\n设 α₃=(a,b,c)ᵀ，则：\n  α₁·α₃ = 0 → a + b = 0 → b = -a\n  α₂·α₃ = 0 → a - b + c = 0 → c = -2a\n取 a=1 → α₃ = (1, -1, -2)ᵀ\n\n(2) 由谱分解定理 A = λ₁·P₁ + λ₂·P₂ + λ₃·P₃\n其中 Pᵢ = (αᵢ·αᵢᵀ)/(αᵢᵀ·αᵢ) 为投影矩阵。\n将特征向量单位化后组成正交矩阵 Q = [e₁, e₂, e₃]，\n则 A = Q·diag(1, 2, -1)·Qᵀ\n\n【核心考点】实对称矩阵三大性质：\n① 特征值全为实数\n② 不同特征值的特征向量必正交（选择题常考）\n③ 一定可正交对角化（充要条件）\n\n【拓展】三对角矩阵的特征值有对称分布的特点，注意利用。",
-      "link": "https://m.koolearn.com/kaoyan/20260507/1946170.html"
+      "title": "线性代数经典题：特征值与矩阵对角化判断",
+      "source": "AI生成（基于李永乐线代经典题型）",
+      "date": "2026-06-28",
+      "content": "【题目】设矩阵 A = [2 1 0; 0 2 1; 0 0 2]，判断A是否可对角化，并说明理由。\n\n【解题步骤】\n第一步：求特征值\n  |A - λI| = (2-λ)³ = 0\n  特征值 λ = 2（三重根，代数重数=3）\n\n第二步：求属于λ=2的特征向量\n  A - 2I = [0 1 0; 0 0 1; 0 0 0]\n  秩 r(A-2I) = 2\n  特征向量空间维数 = n - r(A-2I) = 3 - 2 = 1（几何重数=1）\n\n第三步：判断\n  几何重数(1) < 代数重数(3)\n  → A 不可对角化\n\n【核心知识点】实对称矩阵三大性质（选择题高频）：\n① 特征值全为实数\n② 不同特征值的特征向量必正交\n③ 一定可正交对角化（充要条件）\n\n【易错提醒】不能仅看特征值个数判断可对角化，必须验证每个特征值的几何重数是否等于代数重数。此矩阵是典型的若尔当标准形（Jordan块），考研中判断可对角化是线代必考内容。",
+      "link": ""
     },
     {
       "subject": "english",
-      "title": "每日一句：AI与医疗伦理长难句解析",
-      "source": "何凯文考研英语/每日一句",
-      "date": "2026-06-21",
-      "content": "【英文原句】The increasing integration of AI into healthcare systems has not only improved diagnostic accuracy but also raised profound ethical concerns that policymakers have yet to address comprehensively.\n\n【中文翻译】人工智能在医疗系统中日益广泛的整合不仅提高了诊断的准确性，还引发了深刻的伦理问题，而政策制定者尚未全面应对这些问题。\n\n【语法分析】\n主干结构：has not only improved ... but also raised ...\n① not only... but also... — 并列结构，连接两个谓语\n② that policymakers have yet to address comprehensively — that 引导定语从句，修饰 ethical concerns\n③ The increasing integration of AI into healthcare systems — 主语部分，含介词短语作后置定语\n\n【重点词汇】\n1. integration /ˌɪntɪˈɡreɪʃən/ n. 整合，融合\n2. diagnostic /ˌdaɪəɡˈnɒstɪk/ adj. 诊断的\n3. profound /prəˈfaʊnd/ adj. 深刻的，深远的\n4. ethical /ˈeθɪkəl/ adj. 伦理的，道德的\n5. comprehensively /ˌkɒmprɪˈhensɪvli/ adv. 全面地\n\n【考研真题链接】2018年Text 1考过类似结构：not only...but also 嵌套 that 定语从句。掌握此结构对阅读理解长难句至关重要。",
-      "link": "https://m.koolearn.com/kaoyan/20260521/1946086.html"
+      "title": "每日一句：考研英语真题长难句精练（第1句）",
+      "source": "考研英语真题/综合整理",
+      "date": "2026-06-28",
+      "content": "【英文原句】\n\"The American economic system is organized around a basically private-enterprise, market-oriented economy in which consumers largely determine what shall be produced by spending their money in the marketplace for those goods and services that they want most.\"\n\n【中文翻译】\n美国的经济体制基本上是以私营企业为主、以市场为导向的经济体制。在这一体制中，消费者在很大程度上通过在市场中购买他们最需要的商品和服务来决定生产什么。\n\n【重点词汇】\n1. enterprise /ˈentəpraɪz/ n. 企业；事业；进取心\n2. market-oriented adj. 以市场为导向的\n3. determine /dɪˈtɜːrmɪn/ v. 决定；确定\n4. largely /ˈlɑːrdʒli/ adv. 在很大程度上；主要地\n5. goods and services 商品和服务\n\n【语法分析要点】\n① 主句主干：The American economic system is organized around...\n② in which 引导定语从句，修饰先行词 economy\n③ what shall be produced 是宾语从句，作determine的宾语\n④ by spending their money... 是方式状语\n⑤ that they want most 是定语从句，修饰 goods and services\n⑥ 核心难点：长句包含两层从句嵌套（定语从句→宾语从句→定语从句），需要逐层拆解\n\n【同类结构练习】注意\"in which\"=\"where\"的替换用法，考研阅读中极为常见。",
+      "link": ""
     },
     {
       "subject": "english",
-      "title": "每日单词打卡：考研英语核心高频词汇 Day 88",
-      "source": "考研英语词汇5500/新东方红宝书",
-      "date": "2026-06-21",
-      "content": "今日背诵 8 个高频词汇：\n\n1. inevitable /ɪnˈevɪtəbl/ adj. 不可避免的，必然发生的\n   例：Conflict seems inevitable given the current political climate.\n   真题出处：2016年Text 4\n\n2. substantial /səbˈstænʃəl/ adj. 大量的；实质的；坚固的\n   例：There has been a substantial increase in graduate enrollment.\n   记忆：sub(下面)+stant(站立)+ial → 站得住脚的 → 实质的\n\n3. facilitate /fəˈsɪlɪteɪt/ v. 促进，使容易\n   例：Technology can facilitate communication between different cultures.\n\n4. ambiguous /æmˈbɪɡjuəs/ adj. 模棱两可的，含糊不清的\n   例：The wording of the law is deliberately ambiguous.\n   反义词：unambiguous, explicit, clear-cut\n\n5. predominant /prɪˈdɒmɪnənt/ adj. 主要的，占主导地位的\n   例：English is the predominant language in international business.\n\n6. perceive /pəˈsiːv/ v. 感知；理解；认为\n   例：The public perceives the policy as a failure.\n   搭配：perceive...as...（把…视为…）\n\n7. deteriorate /dɪˈtɪəriəreɪt/ v. 恶化，退化\n   例：His health continued to deteriorate despite treatment.\n   谐音记忆：\"地跌了\"→变差→恶化\n\n8. unprecedented /ʌnˈpresɪdentɪd/ adj. 史无前例的，空前的\n   例：The country is facing an unprecedented economic crisis.\n   词根：un(不)+precedent(先例)+ed → 没有先例的\n\n【今日复习】昨日词汇巩固：scrutinize（仔细审查）、proliferate（激增）、plausible（貌似合理的）",
-      "link": "https://m.koolearn.com/kaoyan/20251119/1903056.html"
+      "title": "每日单词打卡：考研英语核心高频词汇（Day 178）",
+      "source": "考研英语核心词汇5500/AI整理",
+      "date": "2026-06-28",
+      "content": "今日背诵 7 个高频词汇：\n\n1. substantial /səbˈstænʃl/\n   释义：adj. 大量的；实质的；坚固的\n   例句：There has been a substantial increase in the number of students.（学生人数有了大幅增加。）\n   记忆：sub(下面)+stant(站立)+ial → 站得住脚的 → 实质的\n\n2. inevitable /ɪnˈevɪtəbl/\n   释义：adj. 不可避免的；必然发生的\n   例句：War was inevitable after the breakdown of negotiations.（谈判破裂后战争已不可避免。）\n\n3. perceive /pərˈsiːv/\n   释义：v. 察觉；感知；认为\n   例句：She perceived a slight change in his attitude.（她察觉到他态度的微妙变化。）\n   搭配：perceive...as...（把…视为…）\n\n4. undermine /ˌʌndərˈmaɪn/\n   释义：v. 逐渐削弱；暗中破坏\n   例句：This could undermine the public's confidence in the government.（这可能逐渐削弱公众对政府的信心。）\n\n5. predominant /prɪˈdɒmɪnənt/\n   释义：adj. 主要的；占优势的；显著的\n   例句：English is the predominant language in international business.（英语是国际商务中的主要语言。）\n\n6. facilitate /fəˈsɪlɪteɪt/\n   释义：v. 促进；使便利\n   例句：Technology can facilitate communication between people.（技术可以促进人们之间的交流。）\n\n7. ambiguous /æmˈbɪɡjuəs/\n   释义：adj. 模棱两可的；含糊不清的\n   例句：His reply was deliberately ambiguous.（他的回答故意含糊其辞。）\n   反义词：unambiguous, explicit, clear-cut",
+      "link": ""
     },
     {
       "subject": "politics",
-      "title": "马原核心考点：唯物辩证法三大基本规律精讲",
-      "source": "肖秀荣/考研政治知识点精讲精练",
-      "date": "2026-06-21",
-      "content": "【今日考点】唯物辩证法的三大基本规律（马原高频考点）\n\n一、对立统一规律（唯物辩证法的实质与核心）\n· 矛盾的同一性：对立面相互依存、相互贯通（\"相辅相成\"即体现）\n· 矛盾的斗争性：对立面相互排斥、相互对立\n· 同一性是相对的，斗争性是绝对的（选择题高频陷阱）\n· 主要矛盾 vs 次要矛盾、矛盾主要方面 vs 次要方面 → 方法论：两点论与重点论统一\n\n二、量变质变规律\n· 量变：数量增减和场所变更（渐进的、不显著的变化）\n· 质变：根本性质的变化（显著的、飞跃式的变化）\n· 度：保持事物质的数量界限 → 方法论：适度原则\n· 关系：量变是质变的必要准备，质变是量变的必然结果\n\n三、否定之否定规律\n· 发展过程：肯定→否定→否定之否定（螺旋式上升，非简单循环）\n· 揭示：事物发展的方向是前进的，道路是曲折的\n\n【选择题高频陷阱】\n✘ \"否定之否定是简单循环\" → 错！是螺旋式上升\n✘ \"量变就是渐进的\" → 不全对！量变也包括倒退性变化\n✔ \"矛盾的同一性和斗争性相互联结、不可分割\" → 正确",
-      "link": "https://m.koolearn.com/kaoyan/20251224/1916527.html"
+      "title": "马原核心知识点：量变与质变的辩证关系（质量互变规律）",
+      "source": "新东方在线/考研政治",
+      "date": "2026-06-28",
+      "content": "【今日考点】唯物辩证法三大规律之一——质量互变规律\n\n一、核心概念\n① 量变：事物数量的增减和次序的变动，是一种不显著的、渐进的变化\n② 质变：事物性质的根本变化，是事物由一种质态向另一种质态的飞跃\n③ 度：保持事物质的稳定性的数量界限——区分量变与质变的根本标志是\"是否超出度\"\n\n二、辩证关系（必背三句话）\n① 量变是质变的必要准备——没有量变的积累就不可能发生质变\n② 质变是量变的必然结果——量变达到一定程度必然引起质变\n③ 量变和质变相互渗透——在总的量变过程中有部分质变，在质变过程中有量的扩张\n\n三、方法论意义\n① 事物发展是连续性和阶段性的统一\n② 既要脚踏实地做量的积累（\"不积跬步，无以至千里\"），又要善于抓住机遇促成质变\n③ 坚持适度原则，防止\"过犹不及\"\n\n【选择题高频陷阱】\n✘ \"量变就是渐进的\" → 不全对！量变也包括倒退性变化\n✘ \"质变就是发展\" → 错！质变可以是前进也可以是倒退\n✔ 区分量变和质变的根本标志是\"是否超出度\"",
+      "link": "https://m.koolearn.com/kaoyan/20251029/1893754.html"
     },
     {
       "subject": "politics",
-      "title": "腿姐技巧班：物质与意识的辩证关系（选择题必考+干扰项辨析）",
-      "source": "腿姐/考研政治冲刺背诵手册",
-      "date": "2026-06-21",
-      "content": "【核心知识点】物质与意识的辩证关系（马原·唯物论·选择题每年必考）\n\n1. 物质决定意识（唯物主义第一原理）\n  ① 意识是物质世界长期发展的产物（自然界→人类社会→意识产生）\n  ② 意识是人脑的机能（人脑是意识的物质器官，注意：不是大脑，是人脑）\n  ③ 意识是客观存在的主观映象（内容客观 + 形式主观 = 统一）\n\n2. 意识对物质具有能动的反作用\n  ① 正确意识促进事物发展\n  ② 错误意识阻碍事物发展\n  ③ 意识的能动作用受物质条件制约（不能无限夸大）\n\n【腿姐背诵口诀】\"物质第一，意识第二；物质决定意识，意识反作用物质\"\n\n【常见干扰项辨析（选择题救命）】\n✘ \"意识创造物质\" → 混淆能动性与第一性\n✘ \"意识等同于物质\" → 庸俗唯物主义\n✘ \"意识可以脱离物质而存在\" → 唯心主义\n✘ \"人工智能具有人类意识\" → 意识具有社会性和实践性，AI不具备\n✔ \"意识是客观内容与主观形式的统一\" → 正确\n\n【2023真题回顾】单选第1题考\"人工智能能否取代人类意识\"——不能，因为意识具有社会性和实践性。",
-      "link": "https://news.koolearn.com/kaopei/kyzx/206879/"
+      "title": "马原核心知识点：否定之否定规律（含经典选择题）",
+      "source": "新东方在线/考研政治",
+      "date": "2026-06-28",
+      "content": "【今日考点】唯物辩证法三大规律之二——否定之否定规律\n\n一、核心概念\n① 肯定因素：维持事物存在的因素\n② 否定因素：促使事物灭亡的因素\n③ 辩证的否定：事物自身的否定（而非外力否定），是发展的环节和联系的环节\n④ 辩证否定的实质是\"扬弃\"——既克服又保留，既批判又继承\n\n二、事物发展的过程\n① 两次否定：肯定→否定→否定之否定\n② 三个阶段形成一个周期，事物发展呈现\"波浪式前进、螺旋式上升\"\n③ 否定之否定阶段会重复肯定阶段的某些特征，但是在更高层次上的回复\n\n三、揭示的意义\n否定之否定规律揭示了事物发展的方向和道路——前进性与曲折性的统一\n\n【经典选择题】\n唯物辩证法的否定之否定规律揭示了事物发展的（  ）\nA. 方向和道路  B. 形式和状态  C. 结构和功能  D. 源泉和动力\n答案：A\n解析：B是质量互变规律揭示的，D是对立统一规律揭示的。三大规律各有分工：\n· 对立统一规律 → 源泉和动力（核心规律）\n· 质量互变规律 → 形式和状态\n· 否定之否定规律 → 方向和道路\n\n【易混淆辨析】形而上学否定观认为否定是外在的、全盘的抛弃；辩证否定观认为否定是内在的、\"扬弃\"。",
+      "link": "https://m.koolearn.com/kaoyan/20250912/1873810.html"
     },
     {
       "subject": "major",
-      "title": "自动控制原理每日一题：稳态误差分析与参数求解（华工814高频题型）",
-      "source": "B站控制考研每日一题/胡寿松题海与考研指导",
-      "date": "2026-06-21",
-      "content": "【题目】已知单位反馈系统的开环传递函数 G(s) = K/[s(s+1)(s+5)]，求：\n(1) 使系统稳定的 K 的取值范围；\n(2) 输入 r(t) = 2t（斜坡信号）时系统的稳态误差 ess。\n\n【解题步骤】\n\n(1) 稳定性分析——劳斯判据\n闭环特征方程：s³ + 6s² + 5s + K = 0\n劳斯表：\n  s³：1      5\n  s²：6      K\n  s¹：(30-K)/6\n  s⁰：K\n稳定条件：所有行首为正 → K > 0 且 30-K > 0 → 0 < K < 30\n\n(2) 稳态误差计算\n· 系统型别：开环传递函数含 s 的一次因子 → I 型系统\n· 速度误差系数 Kv = lim(s→0) s·G(s) = K/[(0+1)(0+5)] = K/5\n· 斜坡输入 r(t)=2t 时：ess = 2/Kv = 10/K\n\n【答案】(1) 0 < K < 30  (2) ess = 10/K（如 K=10 时 ess=1）\n\n【华南理工814考点提醒】\n稳态误差是华工814真题高频考点，需掌握：\n① 系统型别判断（开环传递函数中积分环节的个数）\n② 静态误差系数法（Kp、Kv、Ka 分别对应阶跃、斜坡、加速度输入）\n③ 终值定理法：ess = lim(s→0) s·E(s)\n④ 特别注意：扰动作用下的稳态误差计算（复合题型）",
-      "link": "https://www.bilibili.com/video/BV1Z4EWzoEEx/"
+      "title": "自动控制原理经典题：闭环传递函数与劳斯稳定性分析",
+      "source": "AI生成（基于胡寿松《自动控制原理》+华工814高频题型）",
+      "date": "2026-06-28",
+      "content": "【题目】已知某单位负反馈系统的前向通道传递函数为 G(s) = K / [s(s+1)(s+2)]，求：\n（1）系统的闭环传递函数 Φ(s)；\n（2）使系统稳定的K值范围。\n\n【解题步骤】\n\n（1）求闭环传递函数\n对于单位负反馈系统：Φ(s) = G(s) / [1 + G(s)]\n分母展开：s(s+1)(s+2) = s³ + 3s² + 2s\nΦ(s) = K / [s³ + 3s² + 2s + K]\n\n（2）劳斯判据判断稳定性\n特征方程：s³ + 3s² + 2s + K = 0\n\n劳斯表：\n  s³ |  1        2\n  s² |  3        K\n  s¹ | (6-K)/3   0\n  s⁰ |  K\n\n稳定条件（第一列全为正）：\n  ① (6-K)/3 > 0  →  K < 6\n  ② K > 0\n  综合得：0 < K < 6\n\n【答案】(1) Φ(s) = K/(s³+3s²+2s+K)  (2) 稳定范围：0 < K < 6\n\n【华南理工814考点提醒】\n① 单位负反馈闭环传递函数公式 Φ=G/(1+G) 必须烂熟于心\n② 劳斯表列写时注意：奇数行和偶数行的系数分别取特征方程的奇偶次项\n③ 劳斯表特殊情况：某行首元素为0（用ε代替继续计算）、整行为0（构造辅助方程）\n④ 此题是华工814真题高频题型的模板，建议变换参数做3-5道同类题巩固。",
+      "link": ""
     }
   ]
 }
