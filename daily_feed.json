@@ -1,71 +1,71 @@
 {
-  "timestamp": 1782608354029,
-  "date": "2026-06-28",
+  "timestamp": 1782788161777,
+  "date": "2026-06-30",
   "target": "华南理工 控制工程",
   "items": [
     {
       "subject": "math",
-      "title": "武忠祥每日一题：极限求法综合（泰勒展开法）",
-      "source": "武忠祥/考研工具站",
-      "date": "2026-06-28",
-      "content": "【题目】求极限 lim(x→0) (eˣ - sin x - 1) / x²\n\n【解题思路】\n第一步：识别题型——代入x=0得 (1 - 0 - 1)/0 = 0/0型未定式\n第二步：选择最优解法——泰勒展开比洛必达更快捷\n第三步：展开过程\n  eˣ = 1 + x + x²/2 + o(x²)\n  sin x = x - x³/6 + o(x³)\n  分子 = (1 + x + x²/2) - (x) - 1 + o(x²) = x²/2 + o(x²)\n第四步：lim = (x²/2) / x² = 1/2\n\n【答案】1/2\n\n【关键泰勒公式速记】\n· sin x = x - x³/6 + x⁵/120 + …\n· eˣ = 1 + x + x²/2! + x³/3! + …\n· cos x = 1 - x²/2 + x⁴/24 - …\n· ln(1+x) = x - x²/2 + x³/3 - …\n\n【核心技巧】当分子含eˣ、sinx、cosx等函数混合时，优先使用泰勒展开到与分母同阶的项。等价无穷小替换只能替换乘除因子，不能替换加减项。",
+      "title": "张宇每日一题第122题：多元函数极限存在性判断",
+      "source": "张宇考研数学/UC每日一题",
+      "date": "2026-06-30",
+      "content": "【题目】求极限：lim(x,y)→(0,0) (x²y)/(x⁴+y²)，判断该极限是否存在。\n\n【解题思路】多元函数极限存在性判断——路径法是核心工具。\n\n【解法】\n① 沿 y = kx² 路径趋近：\n  lim x→0 (x²·kx²)/(x⁴+k²x⁴) = lim x→0 kx⁴/[x⁴(1+k²)] = k/(1+k²)\n  结果与k有关！\n\n② 沿 x = 0 路径趋近：\n  lim y→0 0/y² = 0\n\n③ 沿 y = x 路径趋近：\n  lim x→0 x³/(x⁴+x²) = lim x→0 x/(x²+1) = 0\n\n【结论】由于沿 y=kx² 路径趋近时极限为 k/(1+k²)，其值依赖于k，因此该极限不存在。\n\n【核心方法总结】\n· 多元极限不存在 → 找两条路径使极限值不同即可\n· 常见路径选择：y=kx、y=kx²、x=0、y=0、y=kxⁿ\n· 若怀疑极限不存在，优先尝试 y=kxⁿ（n的选取要使分子分母同阶）\n· 若证明极限存在，则需用夹逼定理或极坐标法\n\n【易错提醒】不能只代入一两条路径就下结论！必须证明所有路径都趋于同一值（用夹逼定理），或找到两条路径使值不同（证不存在）。",
+      "link": "https://mparticle.uc.cn/video.html?sm_article_id=4688217573964655220"
+    },
+    {
+      "subject": "math",
+      "title": "武忠祥每日一题：极限计算综合（泰勒展开+洛必达法则）",
+      "source": "武忠祥老师/考研工具站每日一题",
+      "date": "2026-06-30",
+      "content": "【题目】求极限：lim(x→0) (eˣ - sinx - 1) / x²\n\n【解题过程】\n\n方法一：泰勒展开法（推荐）\n将 eˣ 和 sinx 在 x=0 处展开到与分母同阶（二阶）：\n  eˣ = 1 + x + x²/2 + o(x²)\n  sinx = x - x³/6 + o(x³) ≈ x（取到一阶即可）\n\n代入分子：\n  eˣ - sinx - 1 = (1 + x + x²/2) - x - 1 + o(x²) = x²/2 + o(x²)\n\n所以 lim = (x²/2 + o(x²)) / x² = 1/2\n\n方法二：洛必达法则（0/0型）\n第一次求导：lim(x→0) (eˣ - cosx) / (2x)，代入仍为 0/0 型\n第二次求导：lim(x→0) (eˣ + sinx) / 2 = (1 + 0) / 2 = 1/2\n\n【答案】1/2\n\n【必备泰勒公式速记】\n· eˣ = 1 + x + x²/2! + x³/3! + …\n· sinx = x - x³/6 + x⁵/120 - …\n· cosx = 1 - x²/2 + x⁴/24 - …\n· ln(1+x) = x - x²/2 + x³/3 - …\n· (1+x)^α = 1 + αx + α(α-1)x²/2 + …\n\n【核心技巧】分子含 eˣ、sinx、cosx 等函数混合时，优先泰勒展开到与分母同阶。等价无穷小替换只能替换乘除因子，不能替换加减项！",
       "link": "https://www.kaoyantools.com/26allnotes/26sxnote/24218.html"
     },
     {
       "subject": "math",
-      "title": "每日一题：多元函数全微分与链式求导综合",
-      "source": "考研数学每日一题/UC视频",
-      "date": "2026-06-28",
-      "content": "【题目】设 z = f(x²+y², xy)，其中f具有二阶连续偏导数，求 ∂²z/∂x∂y。\n\n【解题步骤】\n令 u = x²+y²，v = xy\n\n第一步：求 ∂z/∂x\n  ∂z/∂x = f₁'·(2x) + f₂'·y = 2x·f₁' + y·f₂'\n\n第二步：求 ∂²z/∂x∂y = ∂(∂z/∂x)/∂y\n  = ∂/∂y [2x·f₁'(u,v) + y·f₂'(u,v)]\n  = 2x[f₁₁''·(2y) + f₁₂''·x] + f₂' + y[f₂₁''·(2y) + f₂₂''·x]\n  = 4xy·f₁₁'' + (2x²+2y²)·f₁₂'' + xy·f₂₂'' + f₂'\n\n【答案】∂²z/∂x∂y = 4xy·f₁₁'' + 2(x²+y²)·f₁₂'' + xy·f₂₂'' + f₂'\n\n【考点提醒】\n① 链式法则求复合函数偏导数，注意中间变量u,v对x,y的偏导\n② f₁₂'' = f₂₁''（二阶连续偏导条件下混合偏导相等）\n③ 别遗漏乘积求导法则中的f₂'项（y·f₂'对y求导 = f₂' + y·∂f₂'/∂y）\n④ 此题型在考研数学中属于高频考点，建议做3-5道同类题巩固。",
-      "link": "https://mparticle.uc.cn/video.html?sm_article_id=10331954268995392947"
-    },
-    {
-      "subject": "math",
-      "title": "线性代数经典题：特征值与矩阵对角化判断",
-      "source": "AI生成（基于李永乐线代经典题型）",
-      "date": "2026-06-28",
-      "content": "【题目】设矩阵 A = [2 1 0; 0 2 1; 0 0 2]，判断A是否可对角化，并说明理由。\n\n【解题步骤】\n第一步：求特征值\n  |A - λI| = (2-λ)³ = 0\n  特征值 λ = 2（三重根，代数重数=3）\n\n第二步：求属于λ=2的特征向量\n  A - 2I = [0 1 0; 0 0 1; 0 0 0]\n  秩 r(A-2I) = 2\n  特征向量空间维数 = n - r(A-2I) = 3 - 2 = 1（几何重数=1）\n\n第三步：判断\n  几何重数(1) < 代数重数(3)\n  → A 不可对角化\n\n【核心知识点】实对称矩阵三大性质（选择题高频）：\n① 特征值全为实数\n② 不同特征值的特征向量必正交\n③ 一定可正交对角化（充要条件）\n\n【易错提醒】不能仅看特征值个数判断可对角化，必须验证每个特征值的几何重数是否等于代数重数。此矩阵是典型的若尔当标准形（Jordan块），考研中判断可对角化是线代必考内容。",
-      "link": ""
+      "title": "李永乐线代经典题：矩阵方程求逆与特征值分析",
+      "source": "李永乐线性代数辅导讲义/AI精选",
+      "date": "2026-06-30",
+      "content": "【题目】设A为n阶矩阵，满足 A² - 3A + 2E = 0（E为单位矩阵），证明A可逆，并求A⁻¹。\n\n【解题过程】\n\n第一步：将方程变形\n  A² - 3A = -2E\n  A(A - 3E) = -2E\n\n第二步：提取逆矩阵\n  A · [-(A - 3E)/2] = E\n  即 A · [(3E - A)/2] = E\n\n第三步：得出结论\n  A 可逆，且 A⁻¹ = (3E - A)/2\n\n【拓展分析——特征值角度】\n若 λ 是 A 的特征值，代入方程：\n  λ² - 3λ + 2 = 0\n  解得 λ = 1 或 λ = 2\n由于特征值均不为 0，所以 |A| ≠ 0，A 可逆。\n\n【核心知识点】\n① 利用矩阵方程求逆：关键是将方程变形为 A·B = E 的形式\n② 矩阵可逆的等价条件：|A|≠0 ↔ 特征值全不为0 ↔ r(A)=n ↔ A的列向量线性无关\n③ 若 A 满足 f(A)=0，则 A 的特征值满足 f(λ)=0\n\n【易错提醒】对矩阵方程取行列式 |A²-3A+2E|=0 不能直接拆成 |A|²-3|A|+2=0（矩阵行列式不满足加法分配律）。正确做法是用特征值分析。",
+      "link": "https://mbd.baidu.com/newspage/data/dtlandingsuper?from=2001k&nid=dt_5891335194118535562"
     },
     {
       "subject": "english",
-      "title": "每日一句：考研英语真题长难句精练（第1句）",
-      "source": "考研英语真题/综合整理",
-      "date": "2026-06-28",
-      "content": "【英文原句】\n\"The American economic system is organized around a basically private-enterprise, market-oriented economy in which consumers largely determine what shall be produced by spending their money in the marketplace for those goods and services that they want most.\"\n\n【中文翻译】\n美国的经济体制基本上是以私营企业为主、以市场为导向的经济体制。在这一体制中，消费者在很大程度上通过在市场中购买他们最需要的商品和服务来决定生产什么。\n\n【重点词汇】\n1. enterprise /ˈentəpraɪz/ n. 企业；事业；进取心\n2. market-oriented adj. 以市场为导向的\n3. determine /dɪˈtɜːrmɪn/ v. 决定；确定\n4. largely /ˈlɑːrdʒli/ adv. 在很大程度上；主要地\n5. goods and services 商品和服务\n\n【语法分析要点】\n① 主句主干：The American economic system is organized around...\n② in which 引导定语从句，修饰先行词 economy\n③ what shall be produced 是宾语从句，作determine的宾语\n④ by spending their money... 是方式状语\n⑤ that they want most 是定语从句，修饰 goods and services\n⑥ 核心难点：长句包含两层从句嵌套（定语从句→宾语从句→定语从句），需要逐层拆解\n\n【同类结构练习】注意\"in which\"=\"where\"的替换用法，考研阅读中极为常见。",
-      "link": ""
+      "title": "每日一句长难句：考研英语真题经典强调句型精析",
+      "source": "何凯文考研英语/长难句解密2026版",
+      "date": "2026-06-30",
+      "content": "【英文原句】\nIt is the playgoers, the RSC contends, who bring in much of the town's revenue because they spend the night (some of them four or five nights) pouring cash into the hotels and restaurants.\n\n【中文翻译】\n皇家莎士比亚剧团（RSC）认为，正是那些来看戏的人给小镇带来了大量收入，因为他们会在此过夜（有些人住四五个晚上），把钱大把地花在当地酒店和餐馆里。\n\n【重点词汇】\n1. playgoer /ˈpleɪˌɡoʊər/ n. 看戏的人，观剧者\n2. contend /kənˈtend/ v. 声称，主张；竞争（contend that... 声称…）\n3. revenue /ˈrevənjuː/ n. 收入，财政收入（tax revenue 税收）\n4. pour /pɔːr/ v. 倾注，大量投入（pour cash into 大把花钱在…）\n5. bring in 带来，引入（bring in revenue 带来收入）\n\n【语法分析要点】\n① 强调句型 It is ... who ...：强调主语 the playgoers，去掉 It is...who 后句子仍完整\n② 插入语 the RSC contends：表明观点来源，可先跳过再理解主干\n③ because 引导原因状语从句：解释为什么看戏者能带来收入\n④ 括号内补充说明：some of them four or five nights 具体化\"过夜\"时长\n⑤ pouring cash into... 为现在分词短语作伴随状语，修饰 spend the night 的具体方式\n\n【考点提示】强调句 + 插入语 + 原因从句 + 分词状语，四层嵌套是考研阅读长句的典型模式。拆解口诀：找主干 → 去插入 → 辨从句 → 理修饰。",
+      "link": "https://m.koolearn.com/kaoyan/20251231/1917954.html"
     },
     {
       "subject": "english",
-      "title": "每日单词打卡：考研英语核心高频词汇（Day 178）",
+      "title": "每日单词打卡：考研英语核心高频词汇（Day 30）",
       "source": "考研英语核心词汇5500/AI整理",
-      "date": "2026-06-28",
-      "content": "今日背诵 7 个高频词汇：\n\n1. substantial /səbˈstænʃl/\n   释义：adj. 大量的；实质的；坚固的\n   例句：There has been a substantial increase in the number of students.（学生人数有了大幅增加。）\n   记忆：sub(下面)+stant(站立)+ial → 站得住脚的 → 实质的\n\n2. inevitable /ɪnˈevɪtəbl/\n   释义：adj. 不可避免的；必然发生的\n   例句：War was inevitable after the breakdown of negotiations.（谈判破裂后战争已不可避免。）\n\n3. perceive /pərˈsiːv/\n   释义：v. 察觉；感知；认为\n   例句：She perceived a slight change in his attitude.（她察觉到他态度的微妙变化。）\n   搭配：perceive...as...（把…视为…）\n\n4. undermine /ˌʌndərˈmaɪn/\n   释义：v. 逐渐削弱；暗中破坏\n   例句：This could undermine the public's confidence in the government.（这可能逐渐削弱公众对政府的信心。）\n\n5. predominant /prɪˈdɒmɪnənt/\n   释义：adj. 主要的；占优势的；显著的\n   例句：English is the predominant language in international business.（英语是国际商务中的主要语言。）\n\n6. facilitate /fəˈsɪlɪteɪt/\n   释义：v. 促进；使便利\n   例句：Technology can facilitate communication between people.（技术可以促进人们之间的交流。）\n\n7. ambiguous /æmˈbɪɡjuəs/\n   释义：adj. 模棱两可的；含糊不清的\n   例句：His reply was deliberately ambiguous.（他的回答故意含糊其辞。）\n   反义词：unambiguous, explicit, clear-cut",
-      "link": ""
+      "date": "2026-06-30",
+      "content": "今日背诵8个高频词汇：\n\n1. elaborate /ɪˈlæbərət/\n   释义：adj. 精心的，详尽的；v. 详细阐述\n   例句：The researchers made elaborate plans for the experiment.（研究人员为实验制定了详尽的计划。）\n   搭配：elaborate on/upon（详细说明）\n\n2. undermine /ˌʌndərˈmaɪn/\n   释义：v. 逐渐削弱，暗中损害\n   例句：The scandal undermined public confidence in the government.（丑闻逐渐削弱了公众对政府的信心。）\n   记忆：under(下面) + mine(挖) → 在下面挖 → 暗中破坏\n\n3. paradox /ˈpærədɒks/\n   释义：n. 悖论，矛盾的事物；似非而是的论点\n   例句：It is a paradox that the busiest people often have the most free time.（最忙的人往往空闲时间最多，这是一个悖论。）\n\n4. compelling /kəmˈpelɪŋ/\n   释义：adj. 引人注目的，令人信服的\n   例句：The evidence presented a compelling case for reform.（这些证据提出了一个令人信服的改革理由。）\n   搭配：compelling evidence（有力的证据）\n\n5. deteriorate /dɪˈtɪəriəreɪt/\n   释义：v. 恶化，变坏，退化\n   例句：His health continued to deteriorate despite the treatment.（尽管接受了治疗，他的健康状况仍在持续恶化。）\n\n6. indispensable /ˌɪndɪˈspensəbl/\n   释义：adj. 不可缺少的，必需的\n   例句：Smartphones have become indispensable in modern life.（智能手机已成为现代生活中不可或缺的物品。）\n   搭配：indispensable to/for（对…不可缺少的）\n\n7. scrutinize /ˈskruːtənaɪz/\n   释义：v. 仔细审查，细察\n   例句：The committee will scrutinize every clause of the agreement.（委员会将仔细审查协议的每一个条款。）\n\n8. ambiguous /æmˈbɪɡjuəs/\n   释义：adj. 模棱两可的，含混不清的\n   例句：The wording of the contract is deliberately ambiguous.（合同的措辞故意含糊不清。）\n   反义词：unambiguous, explicit, clear-cut",
+      "link": "https://m.koolearn.com/kaoyan/20251119/1903056.html"
     },
     {
       "subject": "politics",
-      "title": "马原核心知识点：量变与质变的辩证关系（质量互变规律）",
-      "source": "新东方在线/考研政治",
-      "date": "2026-06-28",
-      "content": "【今日考点】唯物辩证法三大规律之一——质量互变规律\n\n一、核心概念\n① 量变：事物数量的增减和次序的变动，是一种不显著的、渐进的变化\n② 质变：事物性质的根本变化，是事物由一种质态向另一种质态的飞跃\n③ 度：保持事物质的稳定性的数量界限——区分量变与质变的根本标志是\"是否超出度\"\n\n二、辩证关系（必背三句话）\n① 量变是质变的必要准备——没有量变的积累就不可能发生质变\n② 质变是量变的必然结果——量变达到一定程度必然引起质变\n③ 量变和质变相互渗透——在总的量变过程中有部分质变，在质变过程中有量的扩张\n\n三、方法论意义\n① 事物发展是连续性和阶段性的统一\n② 既要脚踏实地做量的积累（\"不积跬步，无以至千里\"），又要善于抓住机遇促成质变\n③ 坚持适度原则，防止\"过犹不及\"\n\n【选择题高频陷阱】\n✘ \"量变就是渐进的\" → 不全对！量变也包括倒退性变化\n✘ \"质变就是发展\" → 错！质变可以是前进也可以是倒退\n✔ 区分量变和质变的根本标志是\"是否超出度\"",
+      "title": "肖秀荣知识点精讲：质量互变规律（含选择题易错点）",
+      "source": "肖秀荣考研政治/新东方在线",
+      "date": "2026-06-30",
+      "content": "【今日考点】唯物辩证法三大规律之一——质量互变规律\n\n一、核心概念\n① 量变：事物数量的增减和次序的变动，是保持事物质的相对稳定性的不显著变化\n② 质变：事物性质的根本变化，是事物由一种质态向另一种质态的飞跃\n③ 度：保持事物质的稳定性的数量界限。区分量变和质变的根本标志是\"是否超出度\"\n\n二、辩证关系（三大要点，必背）\n① 量变是质变的必要准备——没有量变的积累就不会有质变\n② 质变是量变的必然结果——量变达到一定程度必然引起质变\n③ 量变和质变相互渗透——在总的量变过程中有部分质变，在质变过程中有量的扩张\n\n三、方法论意义\n① 事物发展是连续性和阶段性的统一\n② 既要脚踏实地做量的积累（\"不积跬步，无以至千里\"），又要善于抓住机遇促成质变\n③ 坚持适度原则，防止\"过犹不及\"\n\n【选择题高频陷阱】\n✘ \"量变就是渐进的\" → 不准确！量变也包括倒退性变化\n✘ \"质变就是发展\" → 错误！质变可以是前进也可以是倒退\n✔ 区分量变和质变的根本标志 → \"是否超出度\"\n✔ 质量互变规律揭示的是 → 事物发展的\"形式和状态\"\n✔ 对立统一规律揭示 → \"源泉和动力\"（核心规律）\n✔ 否定之否定规律揭示 → \"方向和道路\"",
       "link": "https://m.koolearn.com/kaoyan/20251029/1893754.html"
     },
     {
       "subject": "politics",
-      "title": "马原核心知识点：否定之否定规律（含经典选择题）",
-      "source": "新东方在线/考研政治",
-      "date": "2026-06-28",
-      "content": "【今日考点】唯物辩证法三大规律之二——否定之否定规律\n\n一、核心概念\n① 肯定因素：维持事物存在的因素\n② 否定因素：促使事物灭亡的因素\n③ 辩证的否定：事物自身的否定（而非外力否定），是发展的环节和联系的环节\n④ 辩证否定的实质是\"扬弃\"——既克服又保留，既批判又继承\n\n二、事物发展的过程\n① 两次否定：肯定→否定→否定之否定\n② 三个阶段形成一个周期，事物发展呈现\"波浪式前进、螺旋式上升\"\n③ 否定之否定阶段会重复肯定阶段的某些特征，但是在更高层次上的回复\n\n三、揭示的意义\n否定之否定规律揭示了事物发展的方向和道路——前进性与曲折性的统一\n\n【经典选择题】\n唯物辩证法的否定之否定规律揭示了事物发展的（  ）\nA. 方向和道路  B. 形式和状态  C. 结构和功能  D. 源泉和动力\n答案：A\n解析：B是质量互变规律揭示的，D是对立统一规律揭示的。三大规律各有分工：\n· 对立统一规律 → 源泉和动力（核心规律）\n· 质量互变规律 → 形式和状态\n· 否定之否定规律 → 方向和道路\n\n【易混淆辨析】形而上学否定观认为否定是外在的、全盘的抛弃；辩证否定观认为否定是内在的、\"扬弃\"。",
-      "link": "https://m.koolearn.com/kaoyan/20250912/1873810.html"
+      "title": "腿姐核心考点精讲：对立统一规律与矛盾分析方法",
+      "source": "腿姐考研政治/新东方在线",
+      "date": "2026-06-30",
+      "content": "【今日考点】唯物辩证法的实质和核心——对立统一规律\n\n一、为什么对立统一规律是唯物辩证法的核心？（多选题高频，必背四点）\n① 它揭示了事物联系的实质内容和发展的内在动力（源泉）\n② 它是贯穿于唯物辩证法其他规律和范畴的中心线索\n③ 矛盾分析方法是最根本的认识方法\n④ 是否承认对立统一规律是唯物辩证法与形而上学对立的实质\n\n二、矛盾的基本属性\n· 同一性：矛盾双方相互依存、相互贯通（在一定条件下相互转化）\n· 斗争性：矛盾双方相互排斥、相互对立\n· 同一性是相对的，斗争性是绝对的\n· 同一性和斗争性相结合，推动事物发展\n\n三、矛盾分析方法（方法论核心）\n· 分析矛盾特殊性的方法（具体问题具体分析）\n· \"两点论\"与\"重点论\"相结合（既看全面又抓重点）\n· 抓关键、看主流的方法\n· 在对立中把握同一与在同一中把握对立\n· 批判与继承相统一（扬弃）\n\n【经典选择题辨析】\n唯物辩证法三大规律各揭示什么？\n· 对立统一规律 → 源泉和动力（核心中的核心）\n· 质量互变规律 → 形式和状态\n· 否定之否定规律 → 方向和道路\n\n【形而上学 vs 辩证法】形而上学用孤立、静止、片面的观点看世界；辩证法用联系、发展、全面的观点看世界。两者的根本分歧在于是否承认矛盾。",
+      "link": "https://m.koolearn.com/kaoyan/20250905/1871309.html"
     },
     {
       "subject": "major",
-      "title": "自动控制原理经典题：闭环传递函数与劳斯稳定性分析",
-      "source": "AI生成（基于胡寿松《自动控制原理》+华工814高频题型）",
-      "date": "2026-06-28",
-      "content": "【题目】已知某单位负反馈系统的前向通道传递函数为 G(s) = K / [s(s+1)(s+2)]，求：\n（1）系统的闭环传递函数 Φ(s)；\n（2）使系统稳定的K值范围。\n\n【解题步骤】\n\n（1）求闭环传递函数\n对于单位负反馈系统：Φ(s) = G(s) / [1 + G(s)]\n分母展开：s(s+1)(s+2) = s³ + 3s² + 2s\nΦ(s) = K / [s³ + 3s² + 2s + K]\n\n（2）劳斯判据判断稳定性\n特征方程：s³ + 3s² + 2s + K = 0\n\n劳斯表：\n  s³ |  1        2\n  s² |  3        K\n  s¹ | (6-K)/3   0\n  s⁰ |  K\n\n稳定条件（第一列全为正）：\n  ① (6-K)/3 > 0  →  K < 6\n  ② K > 0\n  综合得：0 < K < 6\n\n【答案】(1) Φ(s) = K/(s³+3s²+2s+K)  (2) 稳定范围：0 < K < 6\n\n【华南理工814考点提醒】\n① 单位负反馈闭环传递函数公式 Φ=G/(1+G) 必须烂熟于心\n② 劳斯表列写时注意：奇数行和偶数行的系数分别取特征方程的奇偶次项\n③ 劳斯表特殊情况：某行首元素为0（用ε代替继续计算）、整行为0（构造辅助方程）\n④ 此题是华工814真题高频题型的模板，建议变换参数做3-5道同类题巩固。",
-      "link": ""
+      "title": "华南理工814真题精讲：传递函数概念与系统稳定性判据",
+      "source": "华南理工大学814历年真题/豆丁网",
+      "date": "2026-06-30",
+      "content": "【真题来源】华南理工大学自动控制原理历年真题（2005-2010年核心考点整合）\n\n【核心题目1】阐述传递函数的概念及其决定因素。\n答：传递函数是在零初始条件下，线性定常系统输出量的拉普拉斯变换与输入量的拉普拉斯变换之比，记为 G(s) = C(s)/R(s)。传递函数仅由系统的结构和参数决定，与输入信号的形式和大小无关。\n\n【核心题目2】系统稳定的充要条件是什么？\n答：线性系统稳定的充要条件是所有闭环极点均位于复平面的左半部（即极点实部均为负数）。等价表述：系统特征方程的所有根均为负实数或具有负实部的共轭复数。\n\n【核心题目3】简述PID控制器中各部分的作用。\n答：\n· 比例(P)：反映当前误差大小，提高系统响应速度，但不能消除稳态误差\n· 积分(I)：消除系统的稳态误差（静差），提高稳态精度，但可能降低稳定性\n· 微分(D)：反映误差变化趋势，增大阻尼，改善动态性能（减小超调、缩短调节时间）\n\n【核心题目4】频域分析法相比时域分析法的优势？\n答：不用求解系统特征根，具有形象直观、计算量小的特点；可通过实验方法直接获得系统频率特性；便于分析和设计控制系统。\n\n【华南理工814备考重点】\n① 传递函数定义及求法（方框图化简、信号流图梅逊公式）\n② 稳定性判据：劳斯判据（列劳斯表）、赫尔维茨判据\n③ PID各参数对系统性能的影响（必考简答题）\n④ 频域分析法：Bode图、Nyquist图的绘制与稳定性判断\n⑤ 系统校正：串联超前/滞后/超前-滞后校正的设计",
+      "link": "https://www.doczj.com/doc/f011369612.html"
     }
   ]
 }
